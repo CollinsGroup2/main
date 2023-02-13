@@ -1,5 +1,9 @@
 let map = null;
 let shapesGroup = null;
+const dateFormat = Intl.DateTimeFormat("en-GB", {
+    "dateStyle": "long",
+    "timeStyle": "long"
+});
 
 // Initialise the map
 function initLeaflet() {
@@ -55,23 +59,35 @@ function getPoints() {
 
                 const id = mission[0];
                 const coords = getCoords(mission[1]);
-                const creationDate = mission[2];
-                const modifiedDate = mission[3];
-                const type = mission[4];
-                let polygonCoords = mission[5];
+                const creationDate = new Date(mission[2]);
+                const modifiedDate = new Date(mission[3]);
+                const shapeType = mission[4];
+                const polygonCoords = mission[5];
+                const type = mission[6];
 
-                const icon = L.icon({
-                    iconUrl: "assets/Mission.svg",
-                    iconSize: [32, 24],
-                    iconAnchor: [16, 12]
-                });
+                let icon;
+
+                if (type === "IMAGERY") {
+                    icon = L.icon({
+                        iconUrl: "assets/Imagery.svg",
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+                } else if (type === "SCENE") {
+                    icon = L.icon({
+                        iconUrl: "assets/Mission.svg",
+                        iconSize: [32, 24],
+                        iconAnchor: [16, 12]
+                    });
+                }
 
                 let markerText = "";
                 markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
+                markerText += `<strong>Type:</strong> <code>${type}</code><br/>`;
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
-                markerText += `<strong>Created:</strong> ${creationDate}<br/>`;
-                markerText += `<strong>Modified:</strong> ${modifiedDate}<br/>`;
-                markerText += `<strong>Type:</strong> ${type}<br/>`;
+                markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
+                markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
+                markerText += `<strong>Shape:</strong> ${shapeType}<br/>`;
 
                 const marker = L.marker(coords, {icon:icon});
                 marker.shapes = [];
@@ -79,7 +95,7 @@ function getPoints() {
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
 
-                if (type === "Polygon") {
+                if (shapeType === "Polygon") {
                     for (let j = 0; j < polygonCoords.length; j++) {
                         const shapeCoords = swapCoords(polygonCoords[j]);
                         console.debug(`${i} has ${shapeCoords.length} coords`);
@@ -87,7 +103,7 @@ function getPoints() {
                         shapesGroup.addLayer(polygon);
                         marker.shapes.push(polygon);
                     }
-                } else if (type === "LineString") {
+                } else if (shapeType === "LineString") {
                     const shapeCoords = swapCoords(polygonCoords);
                     const line = L.polyline(shapeCoords, { color: "red" });
                     shapesGroup.addLayer(line);

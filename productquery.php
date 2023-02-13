@@ -34,7 +34,8 @@ function productQuery($mission)
     $centre = $data['product']['result']['centre'];
     $dateCreated = $data['product']['result']['datemodified'];
     $dateModified = $data['product']['result']['datemodified'];
-    $type = $data['product']['result']['footprint']['type'];
+    $type = $data['product']['result']['type'];
+    $footprinttype = $data['product']['result']['footprint']['type'];
     $coords = $data['product']['result']['footprint']['coordinates'];
 
     //assign metadata to relevent array and encode to json string
@@ -43,9 +44,9 @@ function productQuery($mission)
         $centre,
         $dateCreated,
         $dateModified,
-        $type,
-        $coords
-        
+        $footprinttype,
+        $coords,
+        $type
     );
 
     return $productData;
