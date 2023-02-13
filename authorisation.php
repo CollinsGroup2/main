@@ -40,3 +40,4 @@ function authorisation()
     //Seperate access token from returned JSON 
     $_SESSION["objJSON"] = json_decode($_SESSION["response"]); //Decode returned JSON
     $_SESSION["token"] = $_SESSION["objJSON"]->access_token; //Seperate access_token
+}
