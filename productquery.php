@@ -1,10 +1,10 @@
 <?php
 
-function productQuery($productID)
+function productQuery($mission)
 {
     $ch = curl_init(); //Initialise a cURL object
 
-    curl_setopt($ch, CURLOPT_URL, "https://hallam.sci-toolset.com/discover/api/v1/products/" . $productID); //Host of sci-toolset and product query
+    curl_setopt($ch, CURLOPT_URL, "https://hallam.sci-toolset.com/discover/api/v1/products/" . $mission); //Host of sci-toolset and product query
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Allows the return of JSON data
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //Stop cURL from verifying the peer's certificate.
@@ -26,11 +26,27 @@ function productQuery($productID)
     //Close the cURL session and free all resources.
     curl_close($ch);
 
+    //$data = json_decode($response, true);
     $data = json_decode($response, true);
 
-    //Seperate access_token
+    //seperate relevent metadata 
+    $id = $data['product']['result']['identifier'];
+    $centre = $data['product']['result']['centre'];
+    $dateCreated = $data['product']['result']['datemodified'];
+    $dateModified = $data['product']['result']['datemodified'];
+    $type = $data['product']['result']['footprint']['type'];
+    $coords = $data['product']['result']['footprint']['coordinates'];
 
-    print_r($data['product']['result']['centre']);
-    
-  
+    //assign metadata to relevent array and encode to json string
+    $productData = json_encode(array(
+        $id,
+        $centre,
+        $dateCreated,
+        $dateModified,
+        $type,
+        $coords
+        
+    ));
+
+    return $productData;
 }
