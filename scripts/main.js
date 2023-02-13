@@ -1,9 +1,12 @@
 let map = null;
+let shapesGroup = null;
 
 // Initialise the map
 function initLeaflet() {
     map = L.map("map");
     map.setView([54, -4], 5);
+    map.on("popupopen", popupOpen);
+    map.on("popupclose", popupClose);
 
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -14,12 +17,18 @@ function initLeaflet() {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 
+    shapesGroup = L.layerGroup([]);
+
     const tileLayers = {
         "Satellite": satelliteLayer,
         "Street": tileLayer
     };
 
-    const layerControl = L.control.layers(tileLayers, {});
+    const overlays = {
+        "Shapes": shapesGroup
+    };
+
+    const layerControl = L.control.layers(tileLayers, overlays);
     layerControl.addTo(map);
 
     L.control.scale().addTo(map);
@@ -53,34 +62,57 @@ function getPoints() {
 
                 const icon = L.icon({
                     iconUrl: "assets/Mission.svg",
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
+                    iconSize: [32, 24],
+                    iconAnchor: [16, 12]
                 });
 
                 let markerText = "";
                 markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
-                markerText += `<strong>Co-ordinates:</strong> ${coords[0]}, ${coords[1]}<br/>`;
+                markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${creationDate}<br/>`;
                 markerText += `<strong>Modified:</strong> ${modifiedDate}<br/>`;
                 markerText += `<strong>Type:</strong> ${type}<br/>`;
 
                 const marker = L.marker(coords, {icon:icon});
+                marker.shapes = [];
                 marker.bindPopup(markerText);
+                marker.getPopup().marker = marker;
                 marker.addTo(map);
 
                 if (type === "Polygon") {
                     for (let j = 0; j < polygonCoords.length; j++) {
                         const shapeCoords = swapCoords(polygonCoords[j]);
+                        console.debug(`${i} has ${shapeCoords.length} coords`);
                         const polygon = L.polygon(shapeCoords, { color: "red" });
-                        polygon.addTo(map);
+                        shapesGroup.addLayer(polygon);
+                        marker.shapes.push(polygon);
                     }
                 } else if (type === "LineString") {
                     const shapeCoords = swapCoords(polygonCoords);
                     const line = L.polyline(shapeCoords, { color: "red" });
-                    line.addTo(map);
+                    shapesGroup.addLayer(line);
+                    marker.shapes.push(line);
                 }
             }
         });
+}
+
+function popupOpen(e) {
+    const marker = e.popup.marker;
+    const shapes = marker.shapes;
+
+    shapes.forEach((shape) => {
+        shape.addTo(map);
+    });
+}
+
+function popupClose(e) {
+    const marker = e.popup.marker;
+    const shapes = marker.shapes;
+
+    shapes.forEach((shape) => {
+        shape.remove();
+    });
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
