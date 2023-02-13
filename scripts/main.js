@@ -25,14 +25,31 @@ function initLeaflet() {
     L.control.scale().addTo(map);
 }
 
+function getCoords(string) {
+    const split = string.split(",");
+    return [ split[0], split[1] ];
+}
+
+function swapCoords(list) {
+    let out = [];
+    for (let i = 0; i < list.length; i++) {
+        out.push([ list[i][1], list[i][0] ]);
+    }
+    return out;
+}
 function getPoints() {
-    fetch("points.php")
-        .then((response) => response.text())
-        .then((text) => {
-            const coords = text.split(",");
-            for (let i = 0; i < coords.length; i += 2) {
-                const long = parseFloat(coords[i]);
-                const lat = parseFloat(coords[i + 1]);
+    fetch("headers.php")
+        .then((response) => response.json())
+        .then((json) => {
+            for (let i = 0; i < json.length; i += 2) {
+                const mission = json[i];
+
+                const id = mission[0];
+                const coords = getCoords(mission[1]);
+                const creationDate = mission[2];
+                const modifiedDate = mission[3];
+                const type = mission[4];
+                let polygonCoords = mission[5];
 
                 const icon = L.icon({
                     iconUrl: "assets/Mission.svg",
@@ -40,9 +57,28 @@ function getPoints() {
                     iconAnchor: [16, 16]
                 });
 
-                const marker = L.marker([long, lat], {icon:icon});
-                marker.bindPopup(`This point is ${long} ${lat}`);
+                let markerText = "";
+                markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
+                markerText += `<strong>Co-ordinates:</strong> ${coords[0]}, ${coords[1]}<br/>`;
+                markerText += `<strong>Created:</strong> ${creationDate}<br/>`;
+                markerText += `<strong>Modified:</strong> ${modifiedDate}<br/>`;
+                markerText += `<strong>Type:</strong> ${type}<br/>`;
+
+                const marker = L.marker(coords, {icon:icon});
+                marker.bindPopup(markerText);
                 marker.addTo(map);
+
+                if (type === "Polygon") {
+                    for (let j = 0; j < polygonCoords.length; j++) {
+                        const shapeCoords = swapCoords(polygonCoords[j]);
+                        const polygon = L.polygon(shapeCoords, { color: "red" });
+                        polygon.addTo(map);
+                    }
+                } else if (type === "LineString") {
+                    const shapeCoords = swapCoords(polygonCoords);
+                    const line = L.polyline(shapeCoords, { color: "red" });
+                    line.addTo(map);
+                }
             }
         });
 }

@@ -8,9 +8,12 @@
     authorisation();//authorisation of the toolset
     initialSearch();//get product id's
 
-    //loop session array missions and retrieve relative metadata linked to product id's
-    foreach ($_SESSION['missions'] as $mission) 
+    $missionData = array();
+
+    foreach($_SESSION['missions'] as $mission)
     {
-        productQuery($mission);
-        echo ",";
+        $missionData[] = productQuery($mission);
     }
+
+    Header("Content-Type: application/json");
+    echo json_encode($missionData);
