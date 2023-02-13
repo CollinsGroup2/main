@@ -1,0 +1,6 @@
+# macOS stuff
+.DS_Store/
+
+# JetBrains PhpStorm data
+.idea/
+
