@@ -12,4 +12,5 @@
     foreach ($_SESSION['missions'] as $mission) 
     {
         productQuery($mission);
+        echo ",";
     }
