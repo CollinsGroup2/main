@@ -35,7 +35,7 @@ function getPoints() {
                 const lat = parseFloat(coords[i + 1]);
 
                 const icon = L.icon({
-                    iconUrl: "assets/plane.svg",
+                    iconUrl: "assets/Mission.svg",
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
