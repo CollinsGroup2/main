@@ -257,9 +257,11 @@ function popupClose(e) {
     if (!marker) return;
     const shapes = marker.shapes;
 
-    shapes.forEach((shape) => {
-        shape.remove();
-    });
+    if (!map.hasLayer(shapesGroup)) {
+        shapes.forEach((shape) => {
+            shape.remove();
+        });
+    }
 }
 
 // Load the world borders onto Leaflet as a GeoJSON layer
