@@ -80,7 +80,7 @@ function swapCoords(list) {
 
 // The big function that gets the data from the backend and adds it to the map
 function getPoints(pgId) {
-    let url = "headers.php?";
+    let url = "backend/get_products.php?";
     if (pgId) {
         url += new URLSearchParams({
             "page": pgId
