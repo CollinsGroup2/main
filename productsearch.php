@@ -3,12 +3,16 @@
 
 //------------------------------------------------------- cURL Object creation ----------------------------------------------------------
 
-function initialSearch()
+function initialSearch($pgID = null)
 {
     $ch = curl_init(); //Initialise a cURL object
 
-    curl_setopt($ch, CURLOPT_URL, "https://hallam.sci-toolset.com/discover/api/v1/products/search"); //Host of sci-toolset and product search
-    curl_setopt($ch, CURLOPT_POST, true); //Regular HTTP post set to true, uses Content-Type: application/x-www-form-urlencoded" header
+    if ($pgID === null) {
+        curl_setopt($ch, CURLOPT_URL, "https://hallam.sci-toolset.com/discover/api/v1/products/search"); //Host of sci-toolset and product search
+        curl_setopt($ch, CURLOPT_POST, true); //Regular HTTP post set to true, uses Content-Type: application/x-www-form-urlencoded" header
+    } else {
+        curl_setopt($ch, CURLOPT_URL, "https://hallam.sci-toolset.com/discover/api/v1/products/page/" . urlencode($pgID)); //Host of sci-toolset and product search
+    }
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Allows the return of JSON data
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //Stop cURL from verifying the peer's certificate.
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); //Stop cURL from verifying the peer's certificate against the provided hostname
@@ -23,12 +27,15 @@ function initialSearch()
     );
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); //set headers to cURL object
 
-    //Set URL payload to grab all id's, 121 results 
-    $payload = '{"size":121}';
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload); //Set query to cURL object
+    if ($pgID === null) {
+        //Set URL payload to grab all id's, 121 results
+        $payload = '{"size":5}';
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload); //Set query to cURL object
+    }
 
     //Execute the curl request and assign returned data to session variable
     $_SESSION["response"] = curl_exec($ch);
+    //if ($pgID !== null)var_dump($_SESSION["response"]);
 
     //Close the cURL session and free all resources.
     curl_close($ch);
@@ -55,8 +62,10 @@ function initialSearch()
             }
         }
     }
-    //create session variable of array
-    $_SESSION['missions'] = $missions;
 
+    return array(
+        "missions" => $missions,
+        "paginationID" => $jsonArray["paginationId"]
+    );
 }
 ?>

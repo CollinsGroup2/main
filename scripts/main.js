@@ -62,14 +62,26 @@ function swapCoords(list) {
 }
 
 // The big function that gets the data from the backend and adds it to the map
-function getPoints() {
-    fetch("headers.php")
+function getPoints(pgId) {
+    let url = "headers.php?";
+    if (pgId) {
+        url += new URLSearchParams({
+            "page": pgId
+        });
+    }
+
+    fetch(url)
         .then((response) => response.json())
         .then((json) => {
             let totalArea = 0;
 
-            for (let i = 0; i < json.length; i += 2) {
-                const mission = json[i];
+            const missions = json["missions"];
+            if (missions.length == 0) {
+                return;
+            }
+
+            for (let i = 0; i < missions.length; i += 2) {
+                const mission = missions[i];
 
                 const id = mission[0];
                 const coords = getCoords(mission[1]);
@@ -141,6 +153,8 @@ function getPoints() {
             console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
             const coveragePct = totalArea / ukArea * 100.0;
             console.info("Coverage: " + coveragePct + "%");
+
+            getPoints(json["paginationID"]);
         });
 }
 

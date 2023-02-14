@@ -6,14 +6,19 @@
     require "productquery.php";
     
     authorisation();//authorisation of the toolset
-    initialSearch();//get product id's
+
+    $pgId = $_GET["page"] ?? null;
+    $missions = initialSearch($pgId);
 
     $missionData = array();
 
-    foreach($_SESSION['missions'] as $mission)
+    foreach($missions['missions'] as $mission)
     {
         $missionData[] = productQuery($mission);
     }
 
     Header("Content-Type: application/json");
-    echo json_encode($missionData);
+    echo json_encode(array(
+        "missions" => $missionData,
+        "paginationID" => $missions["paginationID"]
+    ));
