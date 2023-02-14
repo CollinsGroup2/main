@@ -30,7 +30,7 @@ function initLeaflet() {
 
     shapesGroup = L.layerGroup([]);
 
-    createLayerControl();
+    updateLayerControl();
 
     // Add the scale control
     L.control.scale().addTo(map);
@@ -39,7 +39,7 @@ function initLeaflet() {
     loadBorders();
 }
 
-function createLayerControl() {
+function updateLayerControl() {
     if (layerControl !== null) {
         layerControl.remove();
         layerControl = null;
@@ -197,7 +197,7 @@ function onProductsLoaded() {
 
 function createHeatmap() {
     const data = {
-        min:0,
+        min: 0,
         data: []
     };
 
@@ -211,18 +211,24 @@ function createHeatmap() {
         "valueField": "count"
     }
 
+    // The heatmap needs multiple points at the exact same co-ordinate to work properly
+    // So we round each co-ordinate.
+    // This makes it somewhat ugly and grid-like, but it's better than a sea of blue.
+
     let flat = {};
     let max = 0;
 
     for (const product of products) {
         const ll = product.getLatLng();
         const key = Math.round(ll.lat) + ":" + Math.round(ll.lng);
+
         if (flat.hasOwnProperty(key)) {
             flat[key]++;
-            max = Math.max(max, flat[key]);
         } else {
             flat[key] = 1;
         }
+
+        max = Math.max(max, flat[key]);
     }
 
     data.max = max;
@@ -231,6 +237,7 @@ function createHeatmap() {
         const lat = parseFloat(split[0]);
         const lng = parseFloat(split[1]);
         const count = flat[key];
+
         data.data.push({
             "lat": lat, "lng": lng, "count": count
         });
@@ -238,7 +245,7 @@ function createHeatmap() {
 
     heatMap = new HeatmapOverlay(options);
     heatMap.setData(data);
-    createLayerControl();
+    updateLayerControl();
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
@@ -257,6 +264,7 @@ function popupClose(e) {
     if (!marker) return;
     const shapes = marker.shapes;
 
+    // Only remove the shapes if the shapes layer is disabled
     if (!map.hasLayer(shapesGroup)) {
         shapes.forEach((shape) => {
             shape.remove();
