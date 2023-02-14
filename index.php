@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-GB">
     <head>
+        <title>Map</title>
+        <meta charset="utf-8"/>
         <link rel="stylesheet" href="scripts/leaflet.css" />
         <link rel="stylesheet" href="scripts/leaflet.draw.css" />
         <link rel="stylesheet" href="scripts/main.css" />
