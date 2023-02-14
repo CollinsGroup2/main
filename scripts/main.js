@@ -82,7 +82,7 @@ function getPoints(pgId) {
                 return;
             }
 
-            for (let i = 0; i < missions.length; i += 2) {
+            for (let i = 0; i < missions.length; i ++) {
                 const mission = missions[i];
 
                 const id = mission[0];

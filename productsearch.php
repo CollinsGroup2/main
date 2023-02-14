@@ -3,7 +3,7 @@
 
 //------------------------------------------------------- cURL Object creation ----------------------------------------------------------
 
-const REQUEST_SIZE = 151;
+const REQUEST_SIZE = 150;
 
 function initialSearch($pgID = null)
 {
@@ -37,7 +37,6 @@ function initialSearch($pgID = null)
 
     //Execute the curl request and assign returned data to session variable
     $_SESSION["response"] = curl_exec($ch);
-    //if ($pgID !== null)var_dump($_SESSION["response"]);
 
     //Close the cURL session and free all resources.
     curl_close($ch);
