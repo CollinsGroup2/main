@@ -4,6 +4,7 @@ const dateFormat = Intl.DateTimeFormat("en-GB", {
     "dateStyle": "long",
     "timeStyle": "long"
 });
+const borders = {};
 
 // Initialise the map
 function initLeaflet() {
@@ -36,6 +37,8 @@ function initLeaflet() {
     layerControl.addTo(map);
 
     L.control.scale().addTo(map);
+
+    loadBorders();
 }
 
 function getCoords(string) {
@@ -54,6 +57,8 @@ function getPoints() {
     fetch("headers.php")
         .then((response) => response.json())
         .then((json) => {
+            let totalArea = 0;
+
             for (let i = 0; i < json.length; i += 2) {
                 const mission = json[i];
 
@@ -98,10 +103,16 @@ function getPoints() {
                 if (shapeType === "Polygon") {
                     for (let j = 0; j < polygonCoords.length; j++) {
                         const shapeCoords = swapCoords(polygonCoords[j]);
-                        console.debug(`${i} has ${shapeCoords.length} coords`);
                         const polygon = L.polygon(shapeCoords, { color: "red" });
                         shapesGroup.addLayer(polygon);
                         marker.shapes.push(polygon);
+
+                        const latlngs = polygon.getLatLngs();
+                        let area = 0;
+                        for (const island of latlngs) {
+                            area += L.GeometryUtil.geodesicArea(island);
+                        }
+                        totalArea += area;
                     }
                 } else if (shapeType === "LineString") {
                     const shapeCoords = swapCoords(polygonCoords);
@@ -110,11 +121,18 @@ function getPoints() {
                     marker.shapes.push(line);
                 }
             }
+
+            console.info("Total area: " + L.GeometryUtil.readableArea(totalArea, true, 3));
+            const ukArea = getCountryArea("GB");
+            console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
+            const coveragePct = totalArea / ukArea * 100.0;
+            console.info("Coverage: " + coveragePct + "%");
         });
 }
 
 function popupOpen(e) {
     const marker = e.popup.marker;
+    if (!marker) return;
     const shapes = marker.shapes;
 
     shapes.forEach((shape) => {
@@ -124,11 +142,46 @@ function popupOpen(e) {
 
 function popupClose(e) {
     const marker = e.popup.marker;
+    if (!marker) return;
     const shapes = marker.shapes;
 
     shapes.forEach((shape) => {
         shape.remove();
     });
+}
+
+function loadBorders() {
+    fetch("assets/border.json")
+        .then((response) => response.json())
+        .then((json) => {
+            const layer = L.geoJson(json, {
+                style: function(feature) {
+                    return {
+                        color: "#0099FF",
+                        fill: false
+                    }
+                },
+                onEachFeature: function(feature, layer) {
+                    const key = feature.properties.ISO2;
+                    borders[key] = layer;
+                }
+            });
+            layer.addTo(map);
+        });
+}
+
+function getCountryArea(code) {
+    const border = borders[code];
+    const ll = border.getLatLngs();
+    let area = 0;
+    for (let island of ll) {
+        if (island.length < 2) {
+            island = island[0];
+        }
+
+        area += L.GeometryUtil.geodesicArea(island);
+    }
+    return area;
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
