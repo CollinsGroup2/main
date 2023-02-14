@@ -13,6 +13,8 @@ function initLeaflet() {
     map.on("popupopen", popupOpen);
     map.on("popupclose", popupClose);
 
+    // Create the satellite and street layers.
+    // Only the satellite layer is added to the map to make it the default.
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
@@ -24,6 +26,7 @@ function initLeaflet() {
 
     shapesGroup = L.layerGroup([]);
 
+    // Set up the layer selection control
     const tileLayers = {
         "Satellite": satelliteLayer,
         "Street": tileLayer
@@ -36,16 +39,20 @@ function initLeaflet() {
     const layerControl = L.control.layers(tileLayers, overlays);
     layerControl.addTo(map);
 
+    // Add the scale control
     L.control.scale().addTo(map);
 
+    // Load the country border data
     loadBorders();
 }
 
+// Extract coordinates from a "12.345,67.890" string
 function getCoords(string) {
     const split = string.split(",");
     return [ split[0], split[1] ];
 }
 
+// Swap each component in each coordinate in a list of coordinates.
 function swapCoords(list) {
     let out = [];
     for (let i = 0; i < list.length; i++) {
@@ -53,6 +60,8 @@ function swapCoords(list) {
     }
     return out;
 }
+
+// The big function that gets the data from the backend and adds it to the map
 function getPoints() {
     fetch("headers.php")
         .then((response) => response.json())
@@ -70,6 +79,7 @@ function getPoints() {
                 const polygonCoords = mission[5];
                 const type = mission[6];
 
+                // Determine icon
                 let icon;
 
                 if (type === "IMAGERY") {
@@ -86,6 +96,7 @@ function getPoints() {
                     });
                 }
 
+                // Popup text
                 let markerText = "";
                 markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
                 markerText += `<strong>Type:</strong> <code>${type}</code><br/>`;
@@ -94,12 +105,14 @@ function getPoints() {
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
                 markerText += `<strong>Shape:</strong> ${shapeType}<br/>`;
 
+                // The marker itself
                 const marker = L.marker(coords, {icon:icon});
                 marker.shapes = [];
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
 
+                // Products can have multiple polygons although none in our dataset do
                 if (shapeType === "Polygon") {
                     for (let j = 0; j < polygonCoords.length; j++) {
                         const shapeCoords = swapCoords(polygonCoords[j]);
@@ -107,6 +120,7 @@ function getPoints() {
                         shapesGroup.addLayer(polygon);
                         marker.shapes.push(polygon);
 
+                        // Calculate the area of this polygon and add it to the total
                         const latlngs = polygon.getLatLngs();
                         let area = 0;
                         for (const island of latlngs) {
@@ -130,6 +144,7 @@ function getPoints() {
         });
 }
 
+// Callbacks that add and remove the shape of a product when the popup is opened or close.
 function popupOpen(e) {
     const marker = e.popup.marker;
     if (!marker) return;
@@ -150,6 +165,8 @@ function popupClose(e) {
     });
 }
 
+// Load the world borders onto Leaflet as a GeoJSON layer
+// Each layer is stored in the borders object.
 function loadBorders() {
     fetch("assets/border.json")
         .then((response) => response.json())
@@ -170,10 +187,12 @@ function loadBorders() {
         });
 }
 
+// Calculate the area of a country
 function getCountryArea(code) {
     const border = borders[code];
     const ll = border.getLatLngs();
     let area = 0;
+    // Countries may be comprised of multiple polygons
     for (let island of ll) {
         if (island.length < 2) {
             island = island[0];
