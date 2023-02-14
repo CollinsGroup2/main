@@ -1,0 +1,159 @@
+body {
+  font-family: 'Raleway', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+--sidebar-size: 250px;
+--header-bc: #F8F9FA;
+--border-colour: #dee2e6;
+}
+
+/* The key */
+.map-key-container{
+margin:20px;
+position: absolute;
+width: 150px;
+min-height: 30%;
+bottom: 0;
+border-radius: 25px;
+padding: 10px;
+border: 2px solid var(--border-colour);
+background-color: rgba(0, 0, 0, 0.1);
+}
+
+.map-key-title{
+width: 100%;
+text-align: center;
+}
+
+.map-key-item{
+display: flex;
+justify-content: space-between;
+}
+
+.map-key-item p{
+margin:8px;
+}
+
+/* Bootstrap for search */
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700,900');
+
+.search-input {
+width: auto;
+margin-left: 33px;
+margin-top: 10px;
+margin-bottom: 10px;
+background-color: transparent;
+transition: transform 250ms ease-in-out;
+font-size: 14px;
+line-height: 18px;
+color: #575756;
+background-color: transparent;
+background-repeat: no-repeat;
+background-size: 18px 18px;
+backface-visibility: hidden;
+transform-style: preserve-3d;
+
+padding: 12px 0;
+outline: 0;
+border: 1px solid transparent;
+border-bottom: 1px solid #575756;
+border-radius: 0;
+background-position: 100% center;
+}
+
+.search-input::placeholder {
+color: rgba(87, 87, 86, 0.8);
+text-transform: uppercase;
+letter-spacing: 1.5px;
+}
+
+.search-input:hover,
+      .search-input:focus {
+padding: 12px 0;
+outline: 0;
+border: 1px solid transparent;
+border-bottom: 1px solid #575756;
+border-radius: 0;
+background-position: 100% center;
+}
+
+/* Main section */
+.main {
+top: 0;
+left: 0;
+margin-left: var(--sidebar-size);
+}
+
+@media screen and (max-height: 450px) {
+.sidenav {padding-top: 15px;}
+.sidenav a {font-size: 18px;}
+}
+
+/* Sidebar */
+.sidenav {
+height: 100%;
+width: var(--sidebar-size);
+position: fixed;
+z-index: 1;
+left: 0;
+background-color: var(--header-bc);
+overflow-x: hidden;
+overflow-y: scroll;
+transition: 0.5s;
+}
+
+.sidenav-item {
+padding: 8px 8px 8px 32px;
+text-decoration: none;
+font-size: 25px;
+color: #818181;
+display: flex;
+transition: 0.3s;
+border-bottom: 1px solid var(--border-colour) !important;
+justify-content: space-between;
+}
+
+.sidenav-item a {
+text-decoration: none;
+color: #818181;
+}
+
+.sidenav a:hover {
+color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+position: absolute;
+top: 0;
+right: 25px;
+font-size: 36px;
+margin-left: 50px;
+}
+
+/* Collapsable Sidebar Button */
+.sidebar-button{
+  position: fixed;
+  top: 50%;
+}
+
+
+/* Header */
+.header-item {
+text-decoration: none;
+}
+
+header{
+padding: 30px;
+text-align: center;
+background-color: var(--header-bc);
+color: #efece7;
+font-size: 25px;
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+border-bottom: 1px solid var(--border-colour) !important;
+}
+
