@@ -145,7 +145,9 @@ function getPoints(pgId) {
                 products.push(marker);
             }
 
-            getPoints(json["paginationID"]);
+            if (json["paginationID"]) {
+                getPoints(json["paginationID"]);
+            }
         });
 }
 

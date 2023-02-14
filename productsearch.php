@@ -3,6 +3,8 @@
 
 //------------------------------------------------------- cURL Object creation ----------------------------------------------------------
 
+const REQUEST_SIZE = 151;
+
 function initialSearch($pgID = null)
 {
     $ch = curl_init(); //Initialise a cURL object
@@ -29,7 +31,7 @@ function initialSearch($pgID = null)
 
     if ($pgID === null) {
         //Set URL payload to grab all id's, 121 results
-        $payload = json_encode(array("size" => 150));
+        $payload = json_encode(array("size" => REQUEST_SIZE));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload); //Set query to cURL object
     }
 
@@ -65,7 +67,7 @@ function initialSearch($pgID = null)
 
     return array(
         "missions" => $missions,
-        "paginationID" => $jsonArray["paginationId"]
+        "paginationID" => count($missions) >= REQUEST_SIZE ? $jsonArray["paginationId"] : null
     );
 }
 ?>
