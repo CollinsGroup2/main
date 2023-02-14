@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="scripts/main.css" />
         <script src="scripts/leaflet.js"></script>
         <script src="scripts/leaflet.draw.js"></script>
+        <script src="scripts/heatmap.min.js"></script>
+        <script src="scripts/leaflet-heatmap.js"></script>
         <script src="scripts/main.js"></script>
     </head>
     <body>

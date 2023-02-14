@@ -6,6 +6,9 @@ const dateFormat = Intl.DateTimeFormat("en-GB", {
 });
 const borders = {};
 const products = [];
+let layerControl = null;
+let heatMap = null;
+let satelliteLayer, tileLayer;
 
 // Initialise the map
 function initLeaflet() {
@@ -16,16 +19,31 @@ function initLeaflet() {
 
     // Create the satellite and street layers.
     // Only the satellite layer is added to the map to make it the default.
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
     satelliteLayer.addTo(map);
-    const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 
     shapesGroup = L.layerGroup([]);
+
+    createLayerControl();
+
+    // Add the scale control
+    L.control.scale().addTo(map);
+
+    // Load the country border data
+    loadBorders();
+}
+
+function createLayerControl() {
+    if (layerControl !== null) {
+        layerControl.remove();
+        layerControl = null;
+    }
 
     // Set up the layer selection control
     const tileLayers = {
@@ -37,14 +55,12 @@ function initLeaflet() {
         "Shapes": shapesGroup
     };
 
-    const layerControl = L.control.layers(tileLayers, overlays);
+    if (heatMap) {
+        overlays["Heatmap"] = heatMap;
+    }
+
+    layerControl = L.control.layers(tileLayers, overlays);
     layerControl.addTo(map);
-
-    // Add the scale control
-    L.control.scale().addTo(map);
-
-    // Load the country border data
-    loadBorders();
 }
 
 // Extract coordinates from a "12.345,67.890" string
@@ -175,6 +191,56 @@ function onProductsLoaded() {
     console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
     const coveragePct = totalArea / ukArea * 100.0;
     console.info("Coverage: " + coveragePct + "%");
+
+    createHeatmap();
+}
+
+function createHeatmap() {
+    const data = {
+        min:0,
+        data: []
+    };
+
+    const options = {
+        "radius": 1.5,
+        "scaleRadius": true,
+        "useLocalExtrema": false,
+        "maxOpacity": 0.75,
+        "latField": "lat",
+        "lngField": "lng",
+        "valueField": "count"
+    }
+
+    let flat = {};
+    let max = 0;
+
+    for (const product of products) {
+        const ll = product.getLatLng();
+        const key = Math.round(ll.lat) + ":" + Math.round(ll.lng);
+        if (flat.hasOwnProperty(key)) {
+            flat[key]++;
+            max = Math.max(max, flat[key]);
+        } else {
+            flat[key] = 1;
+        }
+    }
+
+    data.max = max;
+    for (const key in flat) {
+        const split = key.split(":");
+        const lat = parseFloat(split[0]);
+        const lng = parseFloat(split[1]);
+        const count = flat[key];
+        data.data.push({
+            "lat": lat, "lng": lng, "count": count
+        });
+    }
+
+    heatMap = new HeatmapOverlay(options);
+    heatMap.setData(data);
+    createLayerControl();
+
+    console.debug(data);
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
