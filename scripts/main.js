@@ -147,6 +147,8 @@ function getPoints(pgId) {
 
             if (json["paginationID"]) {
                 getPoints(json["paginationID"]);
+            } else {
+                onProductsLoaded();
             }
         });
 }
