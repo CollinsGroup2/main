@@ -239,8 +239,6 @@ function createHeatmap() {
     heatMap = new HeatmapOverlay(options);
     heatMap.setData(data);
     createLayerControl();
-
-    console.debug(data);
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
