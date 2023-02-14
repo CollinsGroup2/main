@@ -10,12 +10,7 @@
     $pgId = $_GET["page"] ?? null;
     $missions = initialSearch($pgId);
 
-    $missionData = array();
-
-    foreach($missions['missions'] as $mission)
-    {
-        $missionData[] = productQuery($mission);
-    }
+    $missionData = productQuery($missions["missions"]);
 
     Header("Content-Type: application/json");
     echo json_encode(array(

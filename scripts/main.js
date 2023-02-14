@@ -5,6 +5,7 @@ const dateFormat = Intl.DateTimeFormat("en-GB", {
     "timeStyle": "long"
 });
 const borders = {};
+const products = [];
 
 // Initialise the map
 function initLeaflet() {
@@ -76,7 +77,8 @@ function getPoints(pgId) {
             let totalArea = 0;
 
             const missions = json["missions"];
-            if (missions.length == 0) {
+            if (missions.length === 0) {
+                onProductsLoaded();
                 return;
             }
 
@@ -120,6 +122,7 @@ function getPoints(pgId) {
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
                 marker.shapes = [];
+                marker.shapeType = shapeType;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
@@ -131,14 +134,6 @@ function getPoints(pgId) {
                         const polygon = L.polygon(shapeCoords, { color: "red" });
                         shapesGroup.addLayer(polygon);
                         marker.shapes.push(polygon);
-
-                        // Calculate the area of this polygon and add it to the total
-                        const latlngs = polygon.getLatLngs();
-                        let area = 0;
-                        for (const island of latlngs) {
-                            area += L.GeometryUtil.geodesicArea(island);
-                        }
-                        totalArea += area;
                     }
                 } else if (shapeType === "LineString") {
                     const shapeCoords = swapCoords(polygonCoords);
@@ -146,16 +141,36 @@ function getPoints(pgId) {
                     shapesGroup.addLayer(line);
                     marker.shapes.push(line);
                 }
-            }
 
-            console.info("Total area: " + L.GeometryUtil.readableArea(totalArea, true, 3));
-            const ukArea = getCountryArea("GB");
-            console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
-            const coveragePct = totalArea / ukArea * 100.0;
-            console.info("Coverage: " + coveragePct + "%");
+                products.push(marker);
+            }
 
             getPoints(json["paginationID"]);
         });
+}
+
+// Called by getPoints when there are no more pages
+function onProductsLoaded() {
+    let totalArea = 0;
+
+    for (const product of products) {
+        if (product.shapeType !== "Polygon") {
+            continue;
+        }
+
+        for (const shape of product.shapes) {
+            const latlngs = shape.getLatLngs();
+            for (const island of latlngs) {
+                totalArea += L.GeometryUtil.geodesicArea(island);
+            }
+        }
+    }
+
+    console.info("Total area: " + L.GeometryUtil.readableArea(totalArea, true, 3));
+    const ukArea = getCountryArea("GB");
+    console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
+    const coveragePct = totalArea / ukArea * 100.0;
+    console.info("Coverage: " + coveragePct + "%");
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
