@@ -29,7 +29,7 @@ function initialSearch($pgID = null)
 
     if ($pgID === null) {
         //Set URL payload to grab all id's, 121 results
-        $payload = '{"size":5}';
+        $payload = json_encode(array("size" => 150));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload); //Set query to cURL object
     }
 
