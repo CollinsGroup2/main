@@ -25,13 +25,14 @@ function openNav() {
   function sb_open() {
     document.getElementById("mySidenav").style.width = "250px";
     document.getElementById("map-display").style.marginLeft = "250px";
-    document.getElementById("button").style.display = "none"
-    document.getElementById("button2").style.display ="inline-block"
+    document.getElementById("button").style.display = "none";
+    document.getElementById("button2").style.display ="inline-block";
    }
   
    function sb_close() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("map-display").style.marginLeft= "0";
-    document.getElementById("button").style.display ="inline-block"
-    document.getElementById("button2").style.display = "none"
+    document.getElementById("button").style.display ="inline-block";
+    document.getElementById("button").style.visibility = "visible";
+    document.getElementById("button2").style.display = "none";
    }

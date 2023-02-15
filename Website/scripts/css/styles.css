@@ -6,11 +6,38 @@ body {
 
 :root {
 --sidebar-size: 250px;
---header-bc: #F8F9FA;
---border-colour: #dee2e6;
+
+--base-1:#333333;
+--map-key-bc: #262626aa;
+--base-2:#7c7c7c;
+--accent1:#7c7c7c;
+--accent2:#cf4520;
+
+--text-colour:#efece7;
+--title-colour: #f36f21;
+--search-text-colour: #efece7;
+--sidenav-hover-text: #efece7;
 }
 
+
 /* The key */
+.map-key-container{
+  margin:10px;
+  position: fixed;
+  right: 0px;
+  width: 150px;
+  min-height: 30%;
+  bottom: 10px;
+  border-radius: 3px;
+  padding: 10px;
+  border: 2px solid var(--accent1);
+  background-color: var(--map-key-bc);
+  display: flex;
+  flex-wrap: wrap;
+  } 
+
+/* have the key on the left */
+/*
 .map-key-container{
 margin:15px;
 position: absolute;
@@ -19,13 +46,15 @@ min-height: 30%;
 bottom: 0;
 border-radius: 5px;
 padding: 10px;
-border: 2px solid var(--border-colour);
+border: 2px solid var(--accent1);
 background-color: rgba(255, 255, 255, 0.6);
-}
+} 
+*/
 
 .map-key-title{
 width: 100%;
 text-align: center;
+color: var(--title-colour);
 }
 
 .map-key-item{
@@ -35,6 +64,7 @@ justify-content: space-between;
 
 .map-key-item p{
 margin:8px;
+color: var(--text-colour);
 }
 
 /* Bootstrap for search */
@@ -49,7 +79,7 @@ background-color: transparent;
 transition: transform 250ms ease-in-out;
 font-size: 14px;
 line-height: 18px;
-color: #575756;
+color: var(--text-colour);
 background-color: transparent;
 background-repeat: no-repeat;
 background-size: 18px 18px;
@@ -59,13 +89,13 @@ transform-style: preserve-3d;
 padding: 12px 0;
 outline: 0;
 border: 1px solid transparent;
-border-bottom: 1px solid #575756;
+border-bottom: 1px solid var(--accent1);
 border-radius: 0;
 background-position: 100% center;
 }
 
 .search-input::placeholder {
-color: rgba(87, 87, 86, 0.8);
+color: var(--search-text-colour);
 text-transform: uppercase;
 letter-spacing: 1.5px;
 }
@@ -75,7 +105,7 @@ letter-spacing: 1.5px;
 padding: 12px 0;
 outline: 0;
 border: 1px solid transparent;
-border-bottom: 1px solid #575756;
+border-bottom: 1px solid var(--accent1);
 border-radius: 0;
 background-position: 100% center;
 }
@@ -83,8 +113,7 @@ background-position: 100% center;
 /* Main section */
 .main {
   width:100%;
-  height:auto;
-  background-color: red;
+  display: inline;
 }
 
 @media screen and (max-height: 450px) {
@@ -98,7 +127,7 @@ height: 100%;
 width: var(--sidebar-size);
 position: fixed;
 left: 0;
-background-color: var(--header-bc);
+background-color: var(--base-1);
 overflow-x: hidden;
 overflow-y: scroll;
 transition: 0.5s;
@@ -108,20 +137,20 @@ transition: 0.5s;
 padding: 8px 8px 8px 32px;
 text-decoration: none;
 font-size: 25px;
-color: #818181;
+color: var(--text-colour);
 display: flex;
 transition: 0.3s;
-border-bottom: 1px solid var(--border-colour) !important;
+border-bottom: 1px solid var(--accent1) !important;
 justify-content: space-between;
 }
 
 .sidenav-item a {
 text-decoration: none;
-color: #818181;
+color: var(--title-colour);
 }
 
 .sidenav a:hover {
-color: #f1f1f1;
+color: var(--sidenav-hover-text);
 }
 
 .sidenav .closebtn {
@@ -136,12 +165,18 @@ margin-left: 50px;
 .sidebar-button{
   position: fixed;
   top: 50%;
-  height: 60px;
-  border: none;
-  border-radius: 4px;
-  width: 30px;
-}
+  height: 55px;
+  border:none;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  width: 25px;
+  background-color: var(--base-1);
+  color: var(--text-colour);
+} 
 
+#button {
+visibility: hidden;
+}
 
 /* Header */
 .header-item {
@@ -151,13 +186,13 @@ text-decoration: none;
 header{
 padding: 30px;
 text-align: center;
-background-color: var(--header-bc);
-color: #efece7;
+background-color: var(--base-1);
+color: var(--text-colour);
 font-size: 25px;
 display: flex;
 flex-direction: row;
 justify-content: space-between;
-border-bottom: 1px solid var(--border-colour) !important;
+border-bottom: 1px solid var(--accent1) !important;
 height: 40px;
 }
 
@@ -165,5 +200,4 @@ height: 40px;
 .map-container {
   width:100%;
   height:100%;
-  background-color: red;
 }
