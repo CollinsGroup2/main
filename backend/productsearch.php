@@ -46,22 +46,9 @@ function initialSearch($pgID = null)
     //Declare array to hold just id values
     $missions = array();
     //loop JSON array
-    foreach ($jsonArray as $value)
+    foreach ($jsonArray["results"]["searchresults"] as $value)
     {
-        foreach ($value as $sub_val) 
-        {
-            $i = 0;
-            foreach ($sub_val as $sub_val2)
-            {
-                
-                if(is_array($sub_val2))
-                {
-                    //store id in array
-                    $missions[$i] = $sub_val2["id"];
-                    $i++;
-                }
-            }
-        }
+        $missions[] = $value["id"];
     }
 
     return array(
