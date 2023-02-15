@@ -6,6 +6,9 @@ const dateFormat = Intl.DateTimeFormat("en-GB", {
 });
 const borders = {};
 const products = [];
+let layerControl = null;
+let heatMap = null, heatMapGroup = null;
+let satelliteLayer, tileLayer;
 
 // Initialise the map
 function initLeaflet() {
@@ -16,16 +19,32 @@ function initLeaflet() {
 
     // Create the satellite and street layers.
     // Only the satellite layer is added to the map to make it the default.
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
     satelliteLayer.addTo(map);
-    const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 
     shapesGroup = L.layerGroup([]);
+    heatMapGroup = L.layerGroup([]);
+
+    updateLayerControl();
+
+    // Add the scale control
+    L.control.scale().addTo(map);
+
+    // Load the country border data
+    loadBorders();
+}
+
+function updateLayerControl() {
+    if (layerControl !== null) {
+        layerControl.remove();
+        layerControl = null;
+    }
 
     // Set up the layer selection control
     const tileLayers = {
@@ -34,17 +53,12 @@ function initLeaflet() {
     };
 
     const overlays = {
-        "Shapes": shapesGroup
+        "Footprints": shapesGroup,
+        "Heatmap": heatMapGroup
     };
 
-    const layerControl = L.control.layers(tileLayers, overlays);
+    layerControl = L.control.layers(tileLayers, overlays);
     layerControl.addTo(map);
-
-    // Add the scale control
-    L.control.scale().addTo(map);
-
-    // Load the country border data
-    loadBorders();
 }
 
 // Extract coordinates from a "12.345,67.890" string
@@ -64,7 +78,7 @@ function swapCoords(list) {
 
 // The big function that gets the data from the backend and adds it to the map
 function getPoints(pgId) {
-    let url = "headers.php?";
+    let url = "backend/get_products.php?";
     if (pgId) {
         url += new URLSearchParams({
             "page": pgId
@@ -89,9 +103,8 @@ function getPoints(pgId) {
                 const coords = getCoords(mission[1]);
                 const creationDate = new Date(mission[2]);
                 const modifiedDate = new Date(mission[3]);
-                const shapeType = mission[4];
-                const polygonCoords = mission[5];
-                const type = mission[6];
+                const footprint = mission[4];
+                const type = mission[5];
 
                 // Determine icon
                 let icon;
@@ -117,36 +130,26 @@ function getPoints(pgId) {
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
-                markerText += `<strong>Shape:</strong> ${shapeType}<br/>`;
 
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
-                marker.shapes = [];
-                marker.shapeType = shapeType;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
 
-                // Products can have multiple polygons although none in our dataset do
-                if (shapeType === "Polygon") {
-                    for (let j = 0; j < polygonCoords.length; j++) {
-                        const shapeCoords = swapCoords(polygonCoords[j]);
-                        const polygon = L.polygon(shapeCoords, { color: "red" });
-                        shapesGroup.addLayer(polygon);
-                        marker.shapes.push(polygon);
-                    }
-                } else if (shapeType === "LineString") {
-                    const shapeCoords = swapCoords(polygonCoords);
-                    const line = L.polyline(shapeCoords, { color: "red" });
-                    shapesGroup.addLayer(line);
-                    marker.shapes.push(line);
-                }
+                const layer = L.GeoJSON.geometryToLayer(footprint, {
+                    "color": "red"
+                });
+                shapesGroup.addLayer(layer);
+                marker.footprint = layer;
 
                 products.push(marker);
             }
 
             if (json["paginationID"]) {
                 getPoints(json["paginationID"]);
+            } else {
+                onProductsLoaded();
             }
         });
 }
@@ -156,15 +159,12 @@ function onProductsLoaded() {
     let totalArea = 0;
 
     for (const product of products) {
-        if (product.shapeType !== "Polygon") {
-            continue;
-        }
-
-        for (const shape of product.shapes) {
-            const latlngs = shape.getLatLngs();
-            for (const island of latlngs) {
-                totalArea += L.GeometryUtil.geodesicArea(island);
+        const latlngs = product.footprint.getLatLngs();
+        for (let island of latlngs) {
+            if (island.length < 2) {
+                island = island[0];
             }
+            totalArea += L.GeometryUtil.geodesicArea(island);
         }
     }
 
@@ -173,27 +173,80 @@ function onProductsLoaded() {
     console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
     const coveragePct = totalArea / ukArea * 100.0;
     console.info("Coverage: " + coveragePct + "%");
+
+    createHeatmap();
+}
+
+function createHeatmap() {
+    const data = {
+        min: 0,
+        data: []
+    };
+
+    const options = {
+        "radius": 1.5,
+        "scaleRadius": true,
+        "useLocalExtrema": false,
+        "maxOpacity": 0.75,
+        "latField": "lat",
+        "lngField": "lng",
+        "valueField": "count"
+    }
+
+    // The heatmap needs multiple points at the exact same co-ordinate to work properly
+    // So we round each co-ordinate.
+    // This makes it somewhat ugly and grid-like, but it's better than a sea of blue.
+
+    let flat = {};
+    let max = 0;
+
+    for (const product of products) {
+        const ll = product.getLatLng();
+        const key = Math.round(ll.lat) + ":" + Math.round(ll.lng);
+
+        if (flat.hasOwnProperty(key)) {
+            flat[key]++;
+        } else {
+            flat[key] = 1;
+        }
+
+        max = Math.max(max, flat[key]);
+    }
+
+    data.max = max;
+    for (const key in flat) {
+        const split = key.split(":");
+        const lat = parseFloat(split[0]);
+        const lng = parseFloat(split[1]);
+        const count = flat[key];
+
+        data.data.push({
+            "lat": lat, "lng": lng, "count": count
+        });
+    }
+
+    heatMap = new HeatmapOverlay(options);
+    heatMap.setData(data);
+    heatMapGroup.addLayer(heatMap);
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
 function popupOpen(e) {
     const marker = e.popup.marker;
     if (!marker) return;
-    const shapes = marker.shapes;
-
-    shapes.forEach((shape) => {
-        shape.addTo(map);
-    });
+    const shape = marker.footprint;
+    shape.addTo(map);
 }
 
 function popupClose(e) {
     const marker = e.popup.marker;
     if (!marker) return;
-    const shapes = marker.shapes;
+    const shape = marker.footprint;
 
-    shapes.forEach((shape) => {
+    // Only remove the shapes if the shapes layer is disabled
+    if (!map.hasLayer(shapesGroup)) {
         shape.remove();
-    });
+    }
 }
 
 // Load the world borders onto Leaflet as a GeoJSON layer
