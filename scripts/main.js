@@ -7,7 +7,7 @@ const dateFormat = Intl.DateTimeFormat("en-GB", {
 const borders = {};
 const products = [];
 let layerControl = null;
-let heatMap = null;
+let heatMap = null, heatMapGroup = null;
 let satelliteLayer, tileLayer;
 
 // Initialise the map
@@ -29,6 +29,7 @@ function initLeaflet() {
     });
 
     shapesGroup = L.layerGroup([]);
+    heatMapGroup = L.layerGroup([]);
 
     updateLayerControl();
 
@@ -52,12 +53,9 @@ function updateLayerControl() {
     };
 
     const overlays = {
-        "Shapes": shapesGroup
+        "Footprints": shapesGroup,
+        "Heatmap": heatMapGroup
     };
-
-    if (heatMap) {
-        overlays["Heatmap"] = heatMap;
-    }
 
     layerControl = L.control.layers(tileLayers, overlays);
     layerControl.addTo(map);
@@ -229,7 +227,7 @@ function createHeatmap() {
 
     heatMap = new HeatmapOverlay(options);
     heatMap.setData(data);
-    updateLayerControl();
+    heatMapGroup.addLayer(heatMap);
 }
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
