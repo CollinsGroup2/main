@@ -105,9 +105,8 @@ function getPoints(pgId) {
                 const coords = getCoords(mission[1]);
                 const creationDate = new Date(mission[2]);
                 const modifiedDate = new Date(mission[3]);
-                const shapeType = mission[4];
-                const polygonCoords = mission[5];
-                const type = mission[6];
+                const footprint = mission[4];
+                const type = mission[5];
 
                 // Determine icon
                 let icon;
@@ -133,30 +132,18 @@ function getPoints(pgId) {
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
-                markerText += `<strong>Shape:</strong> ${shapeType}<br/>`;
 
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
-                marker.shapes = [];
-                marker.shapeType = shapeType;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
 
-                // Products can have multiple polygons although none in our dataset do
-                if (shapeType === "Polygon") {
-                    for (let j = 0; j < polygonCoords.length; j++) {
-                        const shapeCoords = swapCoords(polygonCoords[j]);
-                        const polygon = L.polygon(shapeCoords, { color: "red" });
-                        shapesGroup.addLayer(polygon);
-                        marker.shapes.push(polygon);
-                    }
-                } else if (shapeType === "LineString") {
-                    const shapeCoords = swapCoords(polygonCoords);
-                    const line = L.polyline(shapeCoords, { color: "red" });
-                    shapesGroup.addLayer(line);
-                    marker.shapes.push(line);
-                }
+                const layer = L.GeoJSON.geometryToLayer(footprint, {
+                    "color": "red"
+                });
+                shapesGroup.addLayer(layer);
+                marker.footprint = layer;
 
                 products.push(marker);
             }
@@ -174,15 +161,12 @@ function onProductsLoaded() {
     let totalArea = 0;
 
     for (const product of products) {
-        if (product.shapeType !== "Polygon") {
-            continue;
-        }
-
-        for (const shape of product.shapes) {
-            const latlngs = shape.getLatLngs();
-            for (const island of latlngs) {
-                totalArea += L.GeometryUtil.geodesicArea(island);
+        const latlngs = product.footprint.getLatLngs();
+        for (let island of latlngs) {
+            if (island.length < 2) {
+                island = island[0];
             }
+            totalArea += L.GeometryUtil.geodesicArea(island);
         }
     }
 
@@ -252,23 +236,18 @@ function createHeatmap() {
 function popupOpen(e) {
     const marker = e.popup.marker;
     if (!marker) return;
-    const shapes = marker.shapes;
-
-    shapes.forEach((shape) => {
-        shape.addTo(map);
-    });
+    const shape = marker.footprint;
+    shape.addTo(map);
 }
 
 function popupClose(e) {
     const marker = e.popup.marker;
     if (!marker) return;
-    const shapes = marker.shapes;
+    const shape = marker.footprint;
 
     // Only remove the shapes if the shapes layer is disabled
     if (!map.hasLayer(shapesGroup)) {
-        shapes.forEach((shape) => {
-            shape.remove();
-        });
+        shape.remove();
     }
 }
 
