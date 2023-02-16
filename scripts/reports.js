@@ -80,6 +80,7 @@ function updateProductsList() {
     }
 }
 
+// Update the policy filter dropdown
 function updatePoliciesList() {
     let policies = [];
     for (const id in products) {
@@ -91,6 +92,14 @@ function updatePoliciesList() {
 
     const list = document.getElementById("policies");
     list.innerHTML = "";
+    {
+        const element = document.createElement("a");
+        element.innerText = "All";
+        element.setAttribute("href", "javascript:;");
+        element.onclick = unsetPolicyFilter;
+
+        list.appendChild(element);
+    }
     for (const policy of policies) {
         const element = document.createElement("a");
         element.innerText = policy;
@@ -108,6 +117,11 @@ function doSearch() {
 
 function setPolicyFilter() {
     policyFilter = this.innerText;
+    updateProductsList();
+}
+
+function unsetPolicyFilter() {
+    policyFilter = null;
     updateProductsList();
 }
 
