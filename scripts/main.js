@@ -112,15 +112,15 @@ function getPoints(pgId) {
 
                 if (type === "IMAGERY") {
                     icon = L.icon({
-                        iconUrl: "assets/Imagery.svg",
+                        iconUrl: "scripts/img/Imagery.png",
                         iconSize: [32, 32],
                         iconAnchor: [16, 16]
                     });
                 } else if (type === "SCENE") {
                     icon = L.icon({
-                        iconUrl: "assets/Mission.svg",
-                        iconSize: [32, 24],
-                        iconAnchor: [16, 12]
+                        iconUrl: "scripts/img/plane.png",
+                        iconSize: [32, 21],
+                        iconAnchor: [16, 11]
                     });
                 }
 
