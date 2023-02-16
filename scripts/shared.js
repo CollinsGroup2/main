@@ -34,3 +34,7 @@ function getCountryArea(code) {
     }
     return area;
 }
+
+function dropdown() {
+    document.getElementById("myDropdown").classList.toggle("show"); 
+  }
