@@ -105,6 +105,7 @@ function getPoints(pgId) {
                 const modifiedDate = new Date(mission[3]);
                 const footprint = mission[4];
                 const type = mission[5];
+                const policy = mission[6];
 
                 // Determine icon
                 let icon;
@@ -130,9 +131,11 @@ function getPoints(pgId) {
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
+                markerText += `<strong>Policy:</strong> ${policy}`;
 
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
+                marker.productId = id;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
@@ -156,24 +159,7 @@ function getPoints(pgId) {
 
 // Called by getPoints when there are no more pages
 function onProductsLoaded() {
-    let totalArea = 0;
-
-    for (const product of products) {
-        const latlngs = product.footprint.getLatLngs();
-        for (let island of latlngs) {
-            if (island.length < 2) {
-                island = island[0];
-            }
-            totalArea += L.GeometryUtil.geodesicArea(island);
-        }
-    }
-
-    console.info("Total area: " + L.GeometryUtil.readableArea(totalArea, true, 3));
-    const ukArea = getCountryArea("GB");
-    console.info("UK area: " + L.GeometryUtil.readableArea(ukArea, true, 3));
-    const coveragePct = totalArea / ukArea * 100.0;
-    console.info("Coverage: " + coveragePct + "%");
-
+    updateProductsList();
     createHeatmap();
 }
 
@@ -249,42 +235,38 @@ function popupClose(e) {
     }
 }
 
-// Load the world borders onto Leaflet as a GeoJSON layer
-// Each layer is stored in the borders object.
-function loadBorders() {
-    fetch("assets/border.json")
-        .then((response) => response.json())
-        .then((json) => {
-            const layer = L.geoJson(json, {
-                style: function(feature) {
-                    return {
-                        color: "#0099FF",
-                        fill: false
-                    }
-                },
-                onEachFeature: function(feature, layer) {
-                    const key = feature.properties.ISO2;
-                    borders[key] = layer;
-                }
-            });
-            layer.addTo(map);
-        });
+// Callback for the product links in the sidebar
+function productLinkClick() {
+    const id = this.innerText;
+    const marker = getMarkerById(id);
+    const latlng = marker.getLatLng();
+    map.flyTo(latlng, 12);
+    marker.openPopup();
 }
 
-// Calculate the area of a country
-function getCountryArea(code) {
-    const border = borders[code];
-    const ll = border.getLatLngs();
-    let area = 0;
-    // Countries may be comprised of multiple polygons
-    for (let island of ll) {
-        if (island.length < 2) {
-            island = island[0];
-        }
+// Updates the product list in the sidebar
+function updateProductsList() {
+    const list = document.getElementById("products");
+    list.innerHTML = "";
 
-        area += L.GeometryUtil.geodesicArea(island);
+    for (const product of products) {
+        const element = document.createElement("li");
+        const link = document.createElement("a");
+        link.innerText = product.productId;
+        link.setAttribute("href", "javascript:;");
+        link.onclick = productLinkClick;
+        element.appendChild(link);
+        list.appendChild(element);
     }
-    return area;
+}
+
+function getMarkerById(id) {
+    for (const marker of products) {
+        if (marker.productId === id) {
+            return marker;
+        }
+    }
+    return marker;
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
