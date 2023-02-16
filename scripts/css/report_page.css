@@ -126,3 +126,8 @@ body {
     border-radius: 0;
     background-position: 100% center;
   }
+
+  #chart {
+    width: 100%;
+    height: 100%;
+  }
