@@ -17,6 +17,8 @@ body {
     height: 100vh;
     width: 200px;
     padding: 20px;
+    overflow-x: hidden;
+    overflow-y: scroll;
   }
   .content-container {
     flex: 1;
