@@ -52,11 +52,15 @@ function fetchProducts(pgId) {
         });
 }
 
-function updateProductsList() {
+function updateProductsList(search) {
     const list = document.getElementById("products");
     list.innerHTML = ""; // clear list
 
     for (const id in products) {
+        if (search && !id.includes(search)) {
+            continue;
+        }
+
         const product = products[id];
         const element = document.createElement("li");
         const link = document.createElement("a");
@@ -65,6 +69,11 @@ function updateProductsList() {
         element.appendChild(link);
         list.appendChild(element);
     }
+}
+
+function doSearch() {
+    const field = document.getElementById("search");
+    updateProductsList(field.value);
 }
 
 function onProductsLoaded() {
