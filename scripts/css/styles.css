@@ -22,19 +22,20 @@ body {
 
 /* The key */
 .map-key-container{
-  margin:10px;
+  margin: 10px;
   position: fixed;
-  right: 0px;
-  width: 150px;
-  min-height: 30%;
+  right: 10px;
   bottom: 10px;
+  width:150px;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 3px;
   padding: 10px;
   border: 2px solid var(--accent1);
   background-color: var(--map-key-bc);
   display: flex;
   flex-wrap: wrap;
-  } 
+  }
 
 /* have the key on the left */
 /*
@@ -54,17 +55,21 @@ background-color: rgba(255, 255, 255, 0.6);
 .map-key-title{
 width: 100%;
 text-align: center;
-color: var(--title-colour);
+color: var(--text-colour);
+padding-bottom: 10px;
+font-size: 22px;
 }
 
 .map-key-item{
 display: flex;
-justify-content: space-between;
+justify-content: center;
+padding: 8px 8px 8px 8px;
 }
 
 .map-key-item p{
 margin:8px;
 color: var(--text-colour);
+font-size: 12px
 }
 
 /* Bootstrap for search */
@@ -99,19 +104,9 @@ background-position: 100% center;
 }
 
 .search-input::placeholder {
-color: var(--search-text-colour);
+color: #767676;
 text-transform: uppercase;
 letter-spacing: 1.5px;
-}
-
-.search-input:hover,
-      .search-input:focus {
-padding: 12px 0;
-outline: 0;
-border: 1px solid transparent;
-border-bottom: 1px solid var(--accent1);
-border-radius: 0;
-background-position: 100% center;
 }
 
 /* Main section */
@@ -126,6 +121,10 @@ background-position: 100% center;
 }
 
 /* Sidebar */
+#products {
+  color: white;;
+}
+
 .sidenav {
 height: 100%;
 width: var(--sidebar-size);
@@ -137,6 +136,10 @@ overflow-y: scroll;
 transition: 0.5s;
 }
 
+.sidenav-product {
+  border-bottom: 1px solid var(--accent1) !important;
+}
+
 .sidenav-item {
 padding: 8px 8px 8px 32px;
 text-decoration: none;
@@ -144,7 +147,7 @@ font-size: 25px;
 color: var(--text-colour);
 display: flex;
 transition: 0.3s;
-border-bottom: 1px solid var(--accent1) !important;
+
 justify-content: space-between;
 }
 
