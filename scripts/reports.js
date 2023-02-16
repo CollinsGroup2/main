@@ -10,6 +10,8 @@ let chart = null;
 let minTime = Number.MAX_SAFE_INTEGER;
 let maxTime = Number.MIN_SAFE_INTEGER;
 
+let policyFilter = null;
+
 function fetchProducts(pgId) {
     let url = "backend/get_products.php?";
     if (pgId) {
@@ -52,16 +54,22 @@ function fetchProducts(pgId) {
         });
 }
 
-function updateProductsList(search) {
+function updateProductsList() {
     const list = document.getElementById("products");
     list.innerHTML = ""; // clear list
+    const searchBox = document.getElementById("search");
+    const search = searchBox.value;
 
     for (const id in products) {
+        const product = products[id];
+
         if (search && !id.includes(search)) {
             continue;
         }
+        if (policyFilter && product.policy !== policyFilter) {
+            continue;
+        }
 
-        const product = products[id];
         const element = document.createElement("li");
         const link = document.createElement("a");
         link.innerText = product.id;
@@ -71,13 +79,40 @@ function updateProductsList(search) {
     }
 }
 
+function updatePoliciesList() {
+    let policies = [];
+    for (const id in products) {
+        const policy = products[id].policy;
+        if (!policies.includes(policy)) {
+            policies.push(policy);
+        }
+    }
+
+    const list = document.getElementById("policies");
+    list.innerHTML = "";
+    for (const policy of policies) {
+        const element = document.createElement("a");
+        element.innerText = policy;
+        element.setAttribute("href", "javascript:;");
+        element.onclick = setPolicyFilter;
+
+        list.appendChild(element);
+    }
+}
+
 function doSearch() {
     const field = document.getElementById("search");
-    updateProductsList(field.value);
+    updateProductsList();
+}
+
+function setPolicyFilter() {
+    policyFilter = this.innerText;
+    updateProductsList();
 }
 
 function onProductsLoaded() {
     updateProductsList();
+    updatePoliciesList();
     createChart();
 }
 
