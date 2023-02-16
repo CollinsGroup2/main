@@ -16,6 +16,10 @@ function loadBorders() {
                     borders[key] = layer;
                 }
             });
+
+            if (map) {
+                layer.addTo(map);
+            }
         });
 }
 
