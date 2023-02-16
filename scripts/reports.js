@@ -11,6 +11,7 @@ let minTime = Number.MAX_SAFE_INTEGER;
 let maxTime = Number.MIN_SAFE_INTEGER;
 
 let policyFilter = null;
+let graphPolicy = null;
 
 function fetchProducts(pgId) {
     let url = "backend/get_products.php?";
@@ -246,6 +247,10 @@ function calculateGraphDataSetsAllPolicies() {
 }
 
 function createChart(policy) {
+    if (graphPolicy === policy) {
+        return;
+    }
+
     const element = document.getElementById("chart");
     const data = policy ? calculateGraphDataSets(policy) : calculateGraphDataSetsAllPolicies();
     let title = "Total coverage of the UK";
@@ -288,6 +293,8 @@ function createChart(policy) {
             }
         }
     });
+
+    graphPolicy = policy;
 }
 
 window.onload = function() {
