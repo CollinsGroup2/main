@@ -163,7 +163,7 @@ function selectProduct(id) {
         <strong>Type:</strong> ${currentProduct.type}<br/>
         <strong>Area:</strong> ${L.GeometryUtil.readableArea(area, true, 3)}<br/>
         <strong>Policy:</strong> ${currentProduct.policy}<br/>
-        <strong>Coverage:</strong> ${ukCoverage.toLocaleString()}%
+        <strong>Coverage of UK:</strong> ${ukCoverage.toLocaleString()}%
     `;
     createChart(currentProduct.policy);
 }

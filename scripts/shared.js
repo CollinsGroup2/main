@@ -17,7 +17,7 @@ function loadBorders() {
                 }
             });
 
-            if (map) {
+            if (window.map) {
                 layer.addTo(map);
             }
         });
