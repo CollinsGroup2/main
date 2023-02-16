@@ -140,6 +140,11 @@ transition: 0.5s;
   border-bottom: 1px solid var(--accent1) !important;
 }
 
+.sidebar-product ul{
+  text-decoration: none;
+  color: var(--text-colour);
+}
+
 .sidenav-item {
 padding: 8px 8px 8px 32px;
 text-decoration: none;

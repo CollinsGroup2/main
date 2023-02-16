@@ -10,9 +10,6 @@ let chart = null;
 let minTime = Number.MAX_SAFE_INTEGER;
 let maxTime = Number.MIN_SAFE_INTEGER;
 
-let policyFilter = null;
-let graphPolicy = null;
-
 function fetchProducts(pgId) {
     let url = "backend/get_products.php?";
     if (pgId) {
@@ -55,22 +52,16 @@ function fetchProducts(pgId) {
         });
 }
 
-function updateProductsList() {
+function updateProductsList(search) {
     const list = document.getElementById("products");
     list.innerHTML = ""; // clear list
-    const searchBox = document.getElementById("search");
-    const search = searchBox.value;
 
     for (const id in products) {
-        const product = products[id];
-
         if (search && !id.includes(search)) {
             continue;
         }
-        if (policyFilter && product.policy !== policyFilter) {
-            continue;
-        }
 
+        const product = products[id];
         const element = document.createElement("li");
         const link = document.createElement("a");
         link.innerText = product.id;
@@ -80,53 +71,13 @@ function updateProductsList() {
     }
 }
 
-// Update the policy filter dropdown
-function updatePoliciesList() {
-    let policies = [];
-    for (const id in products) {
-        const policy = products[id].policy;
-        if (!policies.includes(policy)) {
-            policies.push(policy);
-        }
-    }
-
-    const list = document.getElementById("policies");
-    list.innerHTML = "";
-    {
-        const element = document.createElement("a");
-        element.innerText = "All";
-        element.setAttribute("href", "javascript:;");
-        element.onclick = unsetPolicyFilter;
-
-        list.appendChild(element);
-    }
-    for (const policy of policies) {
-        const element = document.createElement("a");
-        element.innerText = policy;
-        element.setAttribute("href", "javascript:;");
-        element.onclick = setPolicyFilter;
-
-        list.appendChild(element);
-    }
-}
-
 function doSearch() {
-    updateProductsList();
-}
-
-function setPolicyFilter() {
-    policyFilter = this.innerText;
-    updateProductsList();
-}
-
-function unsetPolicyFilter() {
-    policyFilter = null;
-    updateProductsList();
+    const field = document.getElementById("search");
+    updateProductsList(field.value);
 }
 
 function onProductsLoaded() {
     updateProductsList();
-    updatePoliciesList();
     createChart();
 }
 
@@ -163,7 +114,7 @@ function selectProduct(id) {
         <strong>Type:</strong> ${currentProduct.type}<br/>
         <strong>Area:</strong> ${L.GeometryUtil.readableArea(area, true, 3)}<br/>
         <strong>Policy:</strong> ${currentProduct.policy}<br/>
-        <strong>Coverage of UK:</strong> ${ukCoverage.toLocaleString()}%
+        <strong>Coverage:</strong> ${ukCoverage.toLocaleString()}%
     `;
     createChart(currentProduct.policy);
 }
@@ -260,10 +211,6 @@ function calculateGraphDataSetsAllPolicies() {
 }
 
 function createChart(policy) {
-    if (graphPolicy === policy) {
-        return;
-    }
-
     const element = document.getElementById("chart");
     const data = policy ? calculateGraphDataSets(policy) : calculateGraphDataSetsAllPolicies();
     let title = "Total coverage of the UK";
@@ -306,8 +253,6 @@ function createChart(policy) {
             }
         }
     });
-
-    graphPolicy = policy;
 }
 
 window.onload = function() {
