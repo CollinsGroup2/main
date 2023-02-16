@@ -11,10 +11,9 @@ body {
 --map-key-bc: #262626aa;
 --base-2:#7c7c7c;
 --accent1:#7c7c7c;
---accent2:#cf4520;
+--accent2:#f36f21;
 
 --text-colour:#efece7;
---title-colour: #f36f21;
 --search-text-colour: #efece7;
 --sidenav-hover-text: #efece7;
 }
@@ -24,17 +23,16 @@ body {
 .map-key-container{
   margin: 10px;
   position: fixed;
-  right: 10px;
+  right: 30%;
+  left: 30%;
   bottom: 10px;
-  width:150px;
-  margin-left: auto;
-  margin-right: auto;
   border-radius: 3px;
   padding: 10px;
   border: 2px solid var(--accent1);
   background-color: var(--map-key-bc);
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
   }
 
 /* have the key on the left */
@@ -63,13 +61,15 @@ font-size: 22px;
 .map-key-item{
 display: flex;
 justify-content: center;
-padding: 8px 8px 8px 8px;
+padding: 0px 8px 0px 8px;
+border-right: 1px solid var(--accent1);
+border-left: 1px solid var(--accent1);
 }
 
 .map-key-item p{
 margin:8px;
 color: var(--text-colour);
-font-size: 12px
+font-size: 14px
 }
 
 /* Bootstrap for search */
@@ -153,7 +153,7 @@ justify-content: space-between;
 
 .sidenav-item a {
 text-decoration: none;
-color: var(--title-colour);
+color: var(--accent2);
 }
 
 .sidenav a:hover {
