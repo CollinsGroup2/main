@@ -42,13 +42,12 @@
     <div id="mySidenav" class="sidenav">
     <!-- SEARCH BAR -->
       <div class="search-container">
-        <input class="search-input" type="text" placeholder="Search">
+        <input class="search-input" type="text" placeholder="Search" id="search" onkeyup="doSearch();">
         <div class="dropdown">
           <button onclick="dropdown()" class="dropbtn"><img src="scripts/img/dropdown-white.png" alt="dropdown image" width="10px"></button>
           <div id="myDropdown" class="dropdown-content">
-          <div style="background-color: #e0e0e0; padding: 12px 16px;"> Search by policy </div>
-            <a href="#NATO">NATO</a>
-            <a href="#GBR">GBR</a>
+            <div style="background-color: #e0e0e0; padding: 12px 16px;"> Search by policy </div>
+            <div id="policies"></div>
           </div>
         </div>
       </div>

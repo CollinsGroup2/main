@@ -111,7 +111,6 @@ function updatePoliciesList() {
 }
 
 function doSearch() {
-    const field = document.getElementById("search");
     updateProductsList();
 }
 

@@ -9,6 +9,7 @@ const products = [];
 let layerControl = null;
 let heatMap = null, heatMapGroup = null;
 let satelliteLayer, tileLayer;
+let policyFilter = null;
 
 // Initialise the map
 function initLeaflet() {
@@ -136,6 +137,7 @@ function getPoints(pgId) {
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
                 marker.productId = id;
+                marker.productPolicy = policy;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
@@ -160,6 +162,7 @@ function getPoints(pgId) {
 // Called by getPoints when there are no more pages
 function onProductsLoaded() {
     updateProductsList();
+    updatePoliciesList();
     createHeatmap();
 }
 
@@ -248,8 +251,17 @@ function productLinkClick() {
 function updateProductsList() {
     const list = document.getElementById("products");
     list.innerHTML = "";
+    const searchBox = document.getElementById("search");
+    const search = searchBox.value;
 
     for (const product of products) {
+        if (search && !product.productId.includes(search)) {
+            continue;
+        }
+        if (policyFilter && product.productPolicy !== policyFilter) {
+            continue;
+        }
+
         const element = document.createElement("li");
         const link = document.createElement("a");
         link.innerText = product.productId;
@@ -258,6 +270,50 @@ function updateProductsList() {
         element.appendChild(link);
         list.appendChild(element);
     }
+}
+
+function doSearch() {
+    updateProductsList();
+}
+
+// Update the policy filter dropdown
+function updatePoliciesList() {
+    let policies = [];
+    for (const product of products) {
+        const policy = product.productPolicy;
+        if (!policies.includes(policy)) {
+            policies.push(policy);
+        }
+    }
+
+    const list = document.getElementById("policies");
+    list.innerHTML = "";
+    {
+        const element = document.createElement("a");
+        element.innerText = "All";
+        element.setAttribute("href", "javascript:;");
+        element.onclick = unsetPolicyFilter;
+
+        list.appendChild(element);
+    }
+    for (const policy of policies) {
+        const element = document.createElement("a");
+        element.innerText = policy;
+        element.setAttribute("href", "javascript:;");
+        element.onclick = setPolicyFilter;
+
+        list.appendChild(element);
+    }
+}
+
+function setPolicyFilter() {
+    policyFilter = this.innerText;
+    updateProductsList();
+}
+
+function unsetPolicyFilter() {
+    policyFilter = null;
+    updateProductsList();
 }
 
 function getMarkerById(id) {
