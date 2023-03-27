@@ -21,6 +21,19 @@ let policyFilter = null;
 // Name of the current policy we're viewing on the graph
 let graphPolicy = null;
 
+
+// Extract coordinates from a "12.345,67.890" string
+function getCoords(string) {
+    const split = string.split(",");
+    return [ split[0], split[1] ];
+}
+
+/* BOUNDING BOX CODE */
+function checkBounds(coords){
+    const border = borders["GB"];
+    return border.contains({ lat: coords[0], lng: coords[1] });
+}
+
 // Fetch the product information
 function fetchProducts(pgId) {
     let url = "backend/get_products.php?";
@@ -44,6 +57,11 @@ function fetchProducts(pgId) {
             for (let i = 0; i < missions.length; i++) {
                 // Get the product information and shove it in the products object
                 const mission = missions[i];
+
+                if (!checkBounds(getCoords(mission[1]))) {
+                    continue;
+                }
+
                 const id = mission[0];
                 products[id] = {
                     "id": id,
@@ -372,4 +390,13 @@ function createChart(policy) {
 window.onload = function() {
     loadBorders();
     fetchProducts();
+}
+
+// Swap each component in each coordinate in a list of coordinates.
+function swapCoords(list) {
+    let out = [];
+    for (let i = 0; i < list.length; i++) {
+        out.push([ list[i][1], list[i][0] ]);
+    }
+    return out;
 }
