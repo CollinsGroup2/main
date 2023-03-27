@@ -30,6 +30,7 @@ function getCountryArea(code) {
             island = island[0];
         }
 
+        // Add up the total area of every polygon
         area += L.GeometryUtil.geodesicArea(island);
     }
     return area;
@@ -37,4 +38,4 @@ function getCountryArea(code) {
 
 function dropdown() {
     document.getElementById("myDropdown").classList.toggle("show"); 
-  }
+}

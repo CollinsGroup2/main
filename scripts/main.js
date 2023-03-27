@@ -1,14 +1,27 @@
+// The leaflet map itself
 let map = null;
+// Shapes/footprint group - for the layers control
 let shapesGroup = null;
+// Date formatter
 const dateFormat = Intl.DateTimeFormat("en-GB", {
     "dateStyle": "long",
     "timeStyle": "long"
 });
+// A map of two-character country codes to the Leaflet layer representing the border for that country
 const borders = {};
+// List of markers representing products
 const products = [];
+/// The layer selection box in the top-right
 let layerControl = null;
-let heatMap = null, heatMapGroup = null;
-let satelliteLayer, tileLayer;
+// The heat map layer
+let heatMap = null;
+// The heat map layer group.
+// The heatmap layer is created after products are loaded, but this always exists, allowing the heatmap to be enabled when products are still loading
+let heatMapGroup = null;
+// Satellite layer
+let satelliteLayer;
+// Street layer
+let tileLayer;
 
 // Initialise the map
 function initLeaflet() {
@@ -19,10 +32,12 @@ function initLeaflet() {
 
     // Create the satellite and street layers.
     // Only the satellite layer is added to the map to make it the default.
+    // Street layer is selectable from the layers control.
     satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
     satelliteLayer.addTo(map);
+    // Create street layer
     tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -40,13 +55,14 @@ function initLeaflet() {
     loadBorders();
 }
 
+// Update the layers controls
 function updateLayerControl() {
+    // Remove the layer control if one already exists
     if (layerControl !== null) {
         layerControl.remove();
         layerControl = null;
     }
 
-    // Set up the layer selection control
     const tileLayers = {
         "Satellite": satelliteLayer,
         "Street": tileLayer
@@ -79,6 +95,7 @@ function swapCoords(list) {
 // The big function that gets the data from the backend and adds it to the map
 function getPoints(pgId) {
     let url = "backend/get_products.php?";
+    // Pagination
     if (pgId) {
         url += new URLSearchParams({
             "page": pgId
@@ -88,9 +105,8 @@ function getPoints(pgId) {
     fetch(url)
         .then((response) => response.json())
         .then((json) => {
-            let totalArea = 0;
-
             const missions = json["missions"];
+            // If there are no more missions, we're at the end of the list
             if (missions.length === 0) {
                 onProductsLoaded();
                 return;
@@ -140,18 +156,23 @@ function getPoints(pgId) {
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
 
+                // Craete the footprint layer from the GeoJSON
                 const layer = L.GeoJSON.geometryToLayer(footprint, {
                     "color": "red"
                 });
                 shapesGroup.addLayer(layer);
                 marker.footprint = layer;
 
+                // add it to the list
                 products.push(marker);
             }
 
+            // If there's another page, fetch it
             if (json["paginationID"]) {
                 getPoints(json["paginationID"]);
-            } else {
+            }
+            // otherwise, we're at the end
+            else {
                 onProductsLoaded();
             }
         });
@@ -163,6 +184,7 @@ function onProductsLoaded() {
     createHeatmap();
 }
 
+// Craetes the heatmap data
 function createHeatmap() {
     const data = {
         min: 0,
@@ -187,19 +209,24 @@ function createHeatmap() {
     let max = 0;
 
     for (const product of products) {
+        // Get the co-ords and round them
         const ll = product.getLatLng();
         const key = Math.round(ll.lat) + ":" + Math.round(ll.lng);
 
+        // Increase the number of products at those rounded coordinates by one
         if (flat.hasOwnProperty(key)) {
             flat[key]++;
         } else {
             flat[key] = 1;
         }
 
+        // Figure out what the highest amount of products are at any given point.
         max = Math.max(max, flat[key]);
     }
 
     data.max = max;
+
+    // Now push that processed data into the array that the heatmap plugin expects
     for (const key in flat) {
         const split = key.split(":");
         const lat = parseFloat(split[0]);
@@ -218,13 +245,17 @@ function createHeatmap() {
 
 // Callbacks that add and remove the shape of a product when the popup is opened or close.
 function popupOpen(e) {
+    // Get the marker, bail if we clicked on nothing
     const marker = e.popup.marker;
     if (!marker) return;
+
+    // Show the footprint
     const shape = marker.footprint;
     shape.addTo(map);
 }
 
 function popupClose(e) {
+    // Get the marker, bail if we clicked on nothing
     const marker = e.popup.marker;
     if (!marker) return;
     const shape = marker.footprint;
@@ -260,13 +291,14 @@ function updateProductsList() {
     }
 }
 
+// Gets a product's marker by its ID
 function getMarkerById(id) {
     for (const marker of products) {
         if (marker.productId === id) {
             return marker;
         }
     }
-    return marker;
+    return null;
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
