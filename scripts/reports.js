@@ -370,15 +370,34 @@ function createChart(policy) {
                     title: {
                         display: true,
                         text: "Coverage of UK (%)"
+                    },
+                    zoom: 
+                    {
+                        enable: true
                     }
                 }
             },
             plugins: {
                 // Enable title
-                title: {
-                    display: true,
-                    text: title
-                }
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                
+                //enable zoom
+                    zoom:
+                    {
+                        zoom:
+                        {
+                            wheel:
+                            {
+                                enable: true
+                            }
+                        }
+                    }
+                
+                
+                
             }
         }
     });
