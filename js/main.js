@@ -22,6 +22,7 @@ let heatMapGroup = null;
 let satelliteLayer;
 // Street layer
 let tileLayer;
+let selectedRectangles;
 
 // Initialise the map
 function initLeaflet() {
@@ -45,6 +46,7 @@ function initLeaflet() {
 
     shapesGroup = L.layerGroup([]);
     heatMapGroup = L.layerGroup([]);
+    selectedRectangles = L.layerGroup([]).addTo(map);
 
     updateLayerControl();
 
@@ -57,6 +59,8 @@ function initLeaflet() {
     // Add geocoder for the search bar
     L.Control.geocoder().addTo(map);
     document.getElementById("map").style.width ="calc(100% - 250px)";
+
+    map.on("boxzoomend", onShiftDrag);
 }
 
 // Update the layers controls
@@ -271,8 +275,7 @@ function popupClose(e) {
 }
 
 // Callback for the product links in the sidebar
-function productLinkClick() {
-    const id = this.innerText;
+function productLinkClick(id) {
     const marker = getMarkerById(id);
     const latlng = marker.getLatLng();
     map.flyTo(latlng, 12);
@@ -280,12 +283,13 @@ function productLinkClick() {
 }
 
 // Updates the product list in the sidebar
-function updateProductsList() {
+function updateProductsList(productList) {
+    productList = productList || products;
     const list = document.getElementById("mySidenav");
     list.innerHTML = "";
     var count = 0;
 
-    for (const product of products) {
+    for (const product of productList) {
         //Creates elements based on template
 
         /*
@@ -309,7 +313,7 @@ function updateProductsList() {
 
         link.innerText = "Product #" + count;
         link.setAttribute("href", "javascript:;");
-        link.onclick = productLinkClick;
+        link.onclick = () => { productLinkClick(product.productId); };
         iconLink.setAttribute("href", "report_page.html");
         iconLink.innerHTML = '&#128196;';
         ul.id = "products";
@@ -332,6 +336,26 @@ function getMarkerById(id) {
         }
     }
     return null;
+}
+
+function onShiftDrag(e) {
+    selectedRectangles.clearLayers();
+    var rectangle;
+    var bounds = [[e.boxZoomBounds._northEast.lat, e.boxZoomBounds._northEast.lng], // gets the bounds/corners of the box drawn
+        [e.boxZoomBounds._southWest.lat, e.boxZoomBounds._southWest.lng]];
+
+    var rectangle = L.rectangle(bounds,{ // creates a rectangle that stays after the drag
+        fillColor: 'red',
+        color: 'red'
+    }).addTo(selectedRectangles);
+    let arr = []; // declare an array to be populated with markers.
+    //can be put into its own function
+    for (const element of products) { // forloop that iterates through all markers to see if they are in the rectangle
+        if (rectangle.contains(element.getLatLng())) {
+            arr.push(element);
+        }
+    }
+    updateProductsList(arr);
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
