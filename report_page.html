@@ -2,22 +2,36 @@
 <html>
   <head>
     <title>We are wolves awoooh</title>
-    <link rel="stylesheet" href="scripts/css/report_page.css"/>  </head>
+    <link rel="stylesheet" href="scripts/css/report_page.css" />
+  </head>
   <script src="scripts/leaflet.js"></script>
   <script src="scripts/leaflet.draw.js"></script>
   <script src="scripts/chart.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"
+    integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"
+    integrity="sha512-wUYbRPLV5zs6IqvWd88HIqZU/b8TBx+I8LEioQ/UC0t5EMCLApqhIAnUg7EsAzdbhhdgW07TqYDdH3QEXRcPOQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
   <script src="scripts/chartjs-adapter-date-fns.bundle.min.js"></script>
   <script src="https://cdn.rawgit.com/hayeswise/Leaflet.PointInPolygon/v1.0.0/wise-leaflet-pip.js"></script>
-    <script src="scripts/shared.js"></script>
-    <script src="scripts/reports.js"></script>
+  <script src="scripts/shared.js"></script>
+  <script src="scripts/reports.js"></script>
   <body>
-    
     <header>
       <div class="header_logo">
         <a href="index.html">
-          
-          <object style="padding-right: 1rem;" data="scripts/img/collins-aerospace-2.png" width="350"> </object>
-                 
+          <object
+            style="padding-right: 1rem"
+            data="scripts/img/collins-aerospace-2.png"
+            width="350"
+          ></object>
         </a>
       </div>
     </header>
@@ -28,19 +42,31 @@
 
         <!-- SEARCH BAR -->
         <div class="search-container">
-          <input class="search__input" type="text" placeholder="Search" id="search" onkeyup="doSearch();">
+          <input
+            class="search__input"
+            type="text"
+            placeholder="Search"
+            id="search"
+            onkeyup="doSearch();"
+          />
           <div class="dropdown">
-            <button onclick="dropdown()" class="dropbtn"><img src="scripts/img/dropdown-black.png" alt="dropdown image" width="10px"></button>
+            <button onclick="dropdown()" class="dropbtn">
+              <img
+                src="scripts/img/dropdown-black.png"
+                alt="dropdown image"
+                width="10px"
+              />
+            </button>
             <div id="myDropdown" class="dropdown-content">
-            <div style="background-color: #e0e0e0; padding: 12px 16px;"> Search by policy </div>
+              <div style="background-color: #e0e0e0; padding: 12px 16px">
+                Search by policy
+              </div>
               <div id="policies"></div>
             </div>
           </div>
         </div>
 
-        <ul id="products">
-        </ul>
-
+        <ul id="products"></ul>
       </div>
       <div class="content-container">
         <div class="top-container">
