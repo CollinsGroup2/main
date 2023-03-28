@@ -53,6 +53,9 @@ function initLeaflet() {
 
     // Load the country border data
     loadBorders();
+
+    // Add geocoder for the search bar
+    L.Control.geocoder().addTo(map);
 }
 
 // Update the layers controls
