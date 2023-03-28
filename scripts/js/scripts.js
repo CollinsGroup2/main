@@ -27,12 +27,16 @@ function openNav() {
     document.getElementById("map-display").style.marginLeft = "250px";
     document.getElementById("button").style.display = "none";
     document.getElementById("button2").style.display ="inline-block";
-   }
+    document.getElementById("map").style.marginLeft ="250px";
+    document.getElementById("map").style.width ="calc(100% - 250px)";
+  }
   
-   function sb_close() {
+  function sb_close() {
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("map-display").style.marginLeft= "0";
     document.getElementById("button").style.display ="inline-block";
     document.getElementById("button").style.visibility = "visible";
     document.getElementById("button2").style.display = "none";
+    document.getElementById("map").style.marginLeft ="0";
+    document.getElementById("map").style.width ="100%";
    }
