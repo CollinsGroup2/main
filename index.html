@@ -2,22 +2,23 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <!-- LEAFLET -->
-<link rel="stylesheet" href="scripts/leaflet.css"/>
-<link rel="stylesheet" href="scripts/leaflet.draw.css"/>
-<link rel="stylesheet" href="scripts/main.css"/>
+<link rel="stylesheet" href="css/leaflet.css"/>
+<link rel="stylesheet" href="css/leaflet.draw.css"/>
+<link rel="stylesheet" href="css/main.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-<script src="scripts/leaflet.js"></script>
-<script src="scripts/leaflet.draw.js"></script>
-<script src="scripts/heatmap.min.js"></script>
-<script src="scripts/leaflet-heatmap.js"></script>
-<script src="scripts/shared.js"></script>
-<script src="scripts/main.js"></script>
+<script src="js/leaflet.js"></script>
+<script src="js/leaflet.draw.js"></script>
+<script src="js/heatmap.min.js"></script>
+<script src="js/leaflet-heatmap.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/main.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <!-- VANILLA -->
-<link rel="stylesheet" href="scripts/css/styles.css">
-<script src="scripts/js/scripts.js"></script> 
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/scripts.js"></script> 
 </head>
 
 
@@ -27,7 +28,7 @@
   <header>
     <div class="header_logo">
       <a href="index.html">
-        <object style="padding-right: 1rem;" data="scripts/img/collins-aerospace-2.png" width="350"> </object>       
+        <object style="padding-right: 1rem;" data="img/collins-aerospace-2.png" width="350"> </object>       
       </a>
     </div>
   </header>
@@ -42,7 +43,7 @@
       <div class="search-container">
         <input class="search-input" type="text" placeholder="Search">
         <div class="dropdown">
-          <button onclick="dropdown()" class="dropbtn"><img src="scripts/img/dropdown-white.png" alt="dropdown image" width="10px"></button>
+          <button onclick="dropdown()" class="dropbtn"><img src="img/dropdown-white.png" alt="dropdown image" width="10px"></button>
           <div id="myDropdown" class="dropdown-content">
           <div style="background-color: #e0e0e0; padding: 12px 16px;"> Search by policy </div>
             <a href="#NATO">NATO</a>
@@ -77,17 +78,17 @@
         </div>
         <!-- MAP KEY ITEMS -->
         <div class="map-key-item">
-          <object style="padding-right: 1rem;" data="scripts/img/plane.png" width="30" height="30"> </object>
+          <object style="padding-right: 1rem;" data="img/plane.png" width="30" height="30"> </object>
           <p style="position:relative; bottom:10px"></p>
           <p>Scene</p>
         </div>
         <div class="map-key-item">
-          <object style="padding-right: 1rem;" data="scripts/img/Imagery.png" width="30" height="30"> </object>
+          <object style="padding-right: 1rem;" data="img/Imagery.png" width="30" height="30"> </object>
           <p style="position:relative; bottom:10px"></p>
           <p>Image</p>
         </div>
         <div class="map-key-item">
-          <object style="padding-right: 1rem;" data="scripts/img/coverage.png" width="30" height="30"> </object>
+          <object style="padding-right: 1rem;" data="img/coverage.png" width="30" height="30"> </object>
           <p style="position:relative; bottom:10px"></p>
           <p>Coverage</p>
         </div>
