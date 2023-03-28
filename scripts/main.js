@@ -53,6 +53,10 @@ function initLeaflet() {
 
     // Load the country border data
     loadBorders();
+
+    // Add geocoder for the search bar
+    L.Control.geocoder().addTo(map);
+    document.getElementById("map").style.width ="calc(100% - 250px)";
 }
 
 // Update the layers controls
@@ -277,17 +281,46 @@ function productLinkClick() {
 
 // Updates the product list in the sidebar
 function updateProductsList() {
-    const list = document.getElementById("products");
+    const list = document.getElementById("mySidenav");
     list.innerHTML = "";
+    var count = 0;
 
     for (const product of products) {
-        const element = document.createElement("li");
+        //Creates elements based on template
+
+        /*
+        <div class="sidenav-product">
+            <div class="sidenav-item">
+              <a href="#">Product #1</a>
+              <a href="report_page.html">&#128196;</a>
+            </div>
+            <ul id="products"><ul>
+          </div>
+        */
+        count++;
+        const div = document.createElement("div");
+        const innerDiv = document.createElement("div");
         const link = document.createElement("a");
-        link.innerText = product.productId;
+        const iconLink = document.createElement("a");
+        const ul = document.createElement("ul");
+
+        div.className = "sidenav-product";
+        innerDiv.className = "sidenav-item";
+
+        link.innerText = "Product #" + count;
         link.setAttribute("href", "javascript:;");
         link.onclick = productLinkClick;
-        element.appendChild(link);
-        list.appendChild(element);
+        iconLink.setAttribute("href", "report_page.html");
+        iconLink.innerHTML = '&#128196;';
+        ul.id = "products";
+        ul.innerHTML = product.productId;
+
+        div.appendChild(innerDiv);
+        innerDiv.appendChild(link);
+        innerDiv.appendChild(iconLink);
+        innerDiv.appendChild(ul);
+        div.appendChild(ul);
+        list.appendChild(div);
     }
 }
 
