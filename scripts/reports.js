@@ -385,16 +385,14 @@ function createChart(policy) {
                     },
                 
                 //enable zoom
-                    zoom:
-                    {
-                        zoom:
+                zoom: {
+                    zoom: {
+                        wheel:
                         {
-                            wheel:
-                            {
-                                enable: true
-                            }
+                            enabled: true,
                         }
                     }
+                }
                 
                 
                 
