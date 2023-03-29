@@ -168,6 +168,10 @@ function onProductsLoaded() {
   updateProductsList();
   updatePoliciesList();
   createChart();
+
+  if (window.location.hash) {
+    selectProduct(window.location.hash.substring(1));
+  }
 }
 
 // Calculate the area of a product's footprint

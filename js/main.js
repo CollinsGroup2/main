@@ -314,7 +314,7 @@ function updateProductsList(productList) {
         link.innerText = "Product #" + count;
         link.setAttribute("href", "javascript:;");
         link.onclick = () => { productLinkClick(product.productId); };
-        iconLink.setAttribute("href", "report_page.html");
+        iconLink.setAttribute("href", "report_page.html#" + product.productId);
         iconLink.innerHTML = '&#128196;';
         ul.id = "products";
         ul.innerHTML = product.productId;
