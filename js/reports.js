@@ -71,10 +71,6 @@ function fetchProducts(pgId) {
           type: mission[5],
           policy: mission[6],
         };
-
-        // Figure out the earliest and latest times
-        minTime = Math.min(minTime, products[id].creation);
-        maxTime = Math.max(maxTime, products[id].creation);
       }
 
       // If there's another page, fetch it
@@ -248,6 +244,9 @@ function calculateGraphDataSets(wantedPolicy) {
     return 0;
   });
 
+  minTime = Number.MAX_SAFE_INTEGER;
+  maxTime = Number.MIN_SAFE_INTEGER;
+
   // Now generate the data for the graph
   let fields = [];
   let accum = 0;
@@ -255,6 +254,10 @@ function calculateGraphDataSets(wantedPolicy) {
     // Turn its creation time into a JS date
     const creationTime = product.creation;
     const date = new Date(parseInt(creationTime));
+
+    // Figure out the earliest and latest times
+    minTime = Math.min(minTime, creationTime);
+    maxTime = Math.max(maxTime, creationTime);
 
     // Figure out the coverage for this product
     const productArea = calculateProductArea(product);
@@ -304,10 +307,17 @@ function calculateGraphDataSetsAllPolicies() {
     }
   }
 
+  minTime = Number.MAX_SAFE_INTEGER;
+  maxTime = Number.MIN_SAFE_INTEGER;
+
   let data = {};
   let accum = {};
   for (const creationTime in productsByCreation) {
     const product = productsByCreation[creationTime];
+
+    // Figure out the earliest and latest times
+    minTime = Math.min(minTime, product.creation);
+    maxTime = Math.max(maxTime, product.creation);
 
     // Force each policy holder to have some data on this point on the X axis
     for (const policy of policies) {
@@ -403,11 +413,19 @@ function createChart(policy) {
           text: title,
         },
         zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x'
+          },
           zoom: {
             wheel: {
               enabled: true,
             },
+            mode: 'x'
           },
+          limits: {
+            x: {min: minTime, max: maxTime}
+          }
         },
       },
     },
