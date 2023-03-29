@@ -137,6 +137,14 @@ overflow-y: scroll;
 transition: 0.5s;
 }
 
+#sidenav-product-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 .sidenav-product {
   border-bottom: 1px solid var(--accent1) !important;
 }
