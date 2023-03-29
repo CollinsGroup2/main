@@ -155,7 +155,8 @@ function getPoints(pgId) {
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
-                markerText += `<strong>Policy:</strong> ${policy}`;
+                markerText += `<strong>Policy:</strong> ${policy}<br/>`;
+                markerText += `<a href="report_page.html#${id}">Report</a>`;
 
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
