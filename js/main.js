@@ -166,7 +166,7 @@ function getPoints(pgId) {
 
                 // Craete the footprint layer from the GeoJSON
                 const layer = L.GeoJSON.geometryToLayer(footprint, {
-                    "color": "red"
+                    "color": 'orange'
                 });
                 shapesGroup.addLayer(layer);
                 marker.footprint = layer;
@@ -345,8 +345,8 @@ function onShiftDrag(e) {
         [e.boxZoomBounds._southWest.lat, e.boxZoomBounds._southWest.lng]];
 
     var rectangle = L.rectangle(bounds,{ // creates a rectangle that stays after the drag
-        fillColor: 'red',
-        color: 'red'
+        fillColor: 'orange',
+        color: 'orange'
     }).addTo(selectedRectangles);
     let arr = []; // declare an array to be populated with markers.
     //can be put into its own function
