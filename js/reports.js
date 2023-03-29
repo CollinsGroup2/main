@@ -174,21 +174,6 @@ function onProductsLoaded() {
   }
 }
 
-// Calculate the area of a product's footprint
-function calculateProductArea(product) {
-  let area = 0;
-  const layer = L.GeoJSON.geometryToLayer(product.footprint);
-  const latlngs = layer.getLatLngs();
-  for (let island of latlngs) {
-    // Just in case the footprint is made of multiple polygons
-    if (island.length < 2) {
-      island = island[0];
-    }
-    area += L.GeometryUtil.geodesicArea(island);
-  }
-  return area;
-}
-
 // When a product is selected from the sidebar
 function selectProduct(id) {
   // Bail if there's not actually a product with the given ID
@@ -200,7 +185,7 @@ function selectProduct(id) {
 
   // Figure out the area and the percentage of the UK's area it covers
   const ukArea = getCountryArea("GB");
-  let area = calculateProductArea(currentProduct);
+  let area = calculateProductArea(currentProduct, true);
   const ukCoverage = (area / ukArea) * 100;
 
   // Now fill in the details
@@ -264,7 +249,7 @@ function calculateGraphDataSets(wantedPolicy) {
     maxTime = Math.max(maxTime, creationTime);
 
     // Figure out the coverage for this product
-    const productArea = calculateProductArea(product);
+    const productArea = calculateProductArea(product, true);
     const coverage = productArea / ukArea;
 
     // The graph is cumulative, so add it to the previous values
@@ -333,7 +318,7 @@ function calculateGraphDataSetsAllPolicies() {
 
       if (product.policy === policy) {
         // Figure out the coverage for this product
-        const productArea = calculateProductArea(product);
+        const productArea = calculateProductArea(product, true);
         const coverage = productArea / ukArea;
 
         // The graph is cumulative, so add it to the previous values

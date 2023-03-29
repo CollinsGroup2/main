@@ -110,6 +110,8 @@ function getPoints(pgId) {
         });
     }
 
+    const ukArea = getCountryArea("GB");
+
     fetch(url)
         .then((response) => response.json())
         .then((json) => {
@@ -148,6 +150,20 @@ function getPoints(pgId) {
                     });
                 }
 
+                // The marker itself
+                const marker = L.marker(coords, {icon:icon});
+                marker.productId = id;
+
+                // Create the footprint layer from the GeoJSON
+                const layer = L.GeoJSON.geometryToLayer(footprint, {
+                    "color": 'orange'
+                });
+                shapesGroup.addLayer(layer);
+                marker.footprint = layer;
+
+                const productArea = calculateProductArea(marker, false);
+                const coverage = productArea / ukArea * 100;
+
                 // Popup text
                 let markerText = "";
                 markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
@@ -156,21 +172,12 @@ function getPoints(pgId) {
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
                 markerText += `<strong>Policy:</strong> ${policy}<br/>`;
+                markerText += `<strong>Area:</strong> ${L.GeometryUtil.readableArea(productArea, true, 3)}<br/>`;
+                markerText += `<strong>Coverage:</strong> ${coverage.toLocaleString()}% of UK<br/>`;
                 markerText += `<a href="report_page.html#${id}">Report</a>`;
-
-                // The marker itself
-                const marker = L.marker(coords, {icon:icon});
-                marker.productId = id;
                 marker.bindPopup(markerText);
                 marker.getPopup().marker = marker;
                 marker.addTo(map);
-
-                // Craete the footprint layer from the GeoJSON
-                const layer = L.GeoJSON.geometryToLayer(footprint, {
-                    "color": 'orange'
-                });
-                shapesGroup.addLayer(layer);
-                marker.footprint = layer;
 
                 // add it to the list
                 products.push(marker);
@@ -264,6 +271,12 @@ function popupOpen(e) {
 }
 
 function popupClose(e) {
+    // If this is for the selection rectangle, get rid of it
+    if (e.popup.isSelectionRectangle) {
+        clearSelection();
+        return;
+    }
+
     // Get the marker, bail if we clicked on nothing
     const marker = e.popup.marker;
     if (!marker) return;
@@ -350,17 +363,32 @@ function onShiftDrag(e) {
         color: 'orange'
     }).addTo(selectedRectangles);
     let arr = []; // declare an array to be populated with markers.
+    const ukArea = getCountryArea("GB");
+    let totalArea = 0;
     //can be put into its own function
     for (const element of products) { // forloop that iterates through all markers to see if they are in the rectangle
         if (rectangle.contains(element.getLatLng())) {
             arr.push(element);
+            const productArea = calculateProductArea(element, false);
+            totalArea += productArea;
         }
     }
+    const coverage = totalArea / ukArea * 100;
     updateProductsList(arr);
+    let text = `${arr.length} products<br/>`;
+    text += `Total Area: ${L.GeometryUtil.readableArea(totalArea, true, 3)}<br/>`;
+    text += `Coverage: ${coverage.toLocaleString()}% of UK`;
+    rectangle.bindPopup(text);
+    rectangle.openPopup();
+    rectangle.getPopup().isSelectionRectangle = true;
+}
+
+function clearSelection() {
+    selectedRectangles.clearLayers();
+    updateProductsList();
 }
 
 // Wait until the browser has loaded everything before we start initialising things.
 window.onload = function() {
     initLeaflet();
-    getPoints();
 }
