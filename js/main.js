@@ -155,8 +155,7 @@ function getPoints(pgId) {
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
                 markerText += `<strong>Modified:</strong> ${dateFormat.format(modifiedDate)}<br/>`;
-                markerText += `<strong>Policy:</strong> ${policy}<br/>`;
-                markerText += `<a href="report_page.html#${id}">Report</a>`;
+                markerText += `<strong>Policy:</strong> ${policy}`;
 
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
@@ -286,7 +285,7 @@ function productLinkClick(id) {
 // Updates the product list in the sidebar
 function updateProductsList(productList) {
     productList = productList || products;
-    const list = document.getElementById("mySidenav");
+    const list = document.getElementById("sidenav-product-container");
     list.innerHTML = "";
     var count = 0;
 
@@ -315,7 +314,7 @@ function updateProductsList(productList) {
         link.innerText = "Product #" + count;
         link.setAttribute("href", "javascript:;");
         link.onclick = () => { productLinkClick(product.productId); };
-        iconLink.setAttribute("href", "report_page.html#" + product.productId);
+        iconLink.setAttribute("href", "report_page.html");
         iconLink.innerHTML = '&#128196;';
         ul.id = "products";
         ul.innerHTML = product.productId;
