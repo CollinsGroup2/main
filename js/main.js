@@ -299,7 +299,7 @@ function productLinkClick(id) {
 // Updates the product list in the sidebar
 function updateProductsList(productList) {
     productList = productList || products;
-    const list = document.getElementById("mySidenav");
+    const list = document.getElementById("sidenav-product-container");
     list.innerHTML = "";
     var count = 0;
 
