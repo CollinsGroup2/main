@@ -42,6 +42,24 @@ body {
   /** BOTTOM CONTAINER **/
   /**h3**/
 
+  .sidenav-product {
+    border-bottom: 1px solid var(--accent1) !important;
+  }
+
+  .sidenav-item {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: var(--text-colour);
+    display: flex;
+    justify-content: space-between;
+    }
+    
+    .sidenav-item a {
+    text-decoration: none;
+    color: var(--accent2);
+    }
+
   .container {
     display: flex;
   }
@@ -51,6 +69,7 @@ body {
     width: 260px;
     padding: 20px;
     overflow-x: hidden;
+    justify-content: center;
     overflow-y: scroll;
   }
   .content-container {
@@ -67,6 +86,7 @@ body {
   .bottom-container {
     background-color: #d0d0d0;
     height: 50%;
+    padding: 10px;
   }
   footer {
     position: fixed;
@@ -83,6 +103,7 @@ body {
 
 .search-container {
   display:flex;
+  justify-content: center;
 }
 
   .search__title {
@@ -177,7 +198,7 @@ body {
     border: 1px solid #ddd;
     z-index: 1;
     right: 10px;
-    bottom: -120px;
+    bottom: -170px;
   }
   
   .dropdown-content a {

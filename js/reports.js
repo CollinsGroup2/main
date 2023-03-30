@@ -88,6 +88,7 @@ function fetchProducts(pgId) {
 function updateProductsList(search) {
   const list = document.getElementById("products");
   list.innerHTML = ""; // clear list
+  var count = 0;  
 
   for (const id in products) {
     const product = products[id];
@@ -99,13 +100,83 @@ function updateProductsList(search) {
     if (policyFilter && product.policy !== policyFilter) {
       continue;
     }
+    /*
+    <div class="sidenav-product">
+        <div class="sidenav-item">
+          <a href="#">Product #1</a>
+          <a href="report_page.html">&#128196;</a>
+        </div>
+        <ul id="products"><ul>
+      </div>
+      count++;
+      const div = document.createElement("div");
+      const innerDiv = document.createElement("div");
+      const link = document.createElement("a");
+      const iconLink = document.createElement("a");
+      const ul = document.createElement("ul");
+  
+      div.className = "sidenav-product";
+      innerDiv.className = "sidenav-item";
+      
+      link.innerText = "Product #" + count;
+      link.setAttribute("href", "javascript:;");
+      link.onclick = () => { productLinkClick(product.productId); };
+      iconLink.setAttribute("href", "report_page.html#" + product.productId);
+      iconLink.innerHTML = '&#128196;';
+      ul.id = "products";
+      ul.innerHTML = product.productId;
+  
+      div.appendChild(innerDiv);
+      innerDiv.appendChild(link);
+      innerDiv.appendChild(iconLink);
+      innerDiv.appendChild(ul);
+      div.appendChild(ul);
+      list.appendChild(div);
+      */
 
-    const element = document.createElement("li");
+
+    count++;
+
+    const div = document.createElement("div");
+    const innerDiv = document.createElement("div");
     const link = document.createElement("a");
+    const iconLink = document.createElement("a");
+    const ul = document.createElement("ul");
+    
+    div.className = "sidenav-product";
+    innerDiv.className = "sidenav-item";
+
+    link.innerText = "Product #" + count;
+    link.setAttribute("href", `javascript:selectProduct("${id}");`);
+    link.onclick = () => { productLinkClick(product); };
+    ul.id = "products";
+    ul.innerHTML = product.id;
+
+    div.appendChild(innerDiv);
+    innerDiv.appendChild(link);
+    innerDiv.appendChild(iconLink);
+    innerDiv.appendChild(ul);
+    div.appendChild(ul);
+    list.appendChild(div);
+
+
+    /*
+    
+    link.innerText = "Product #" + count;
+    link.setAttribute("href", "javascript:;");
+    link.onclick = () => { productLinkClick(product.productId); };
+    iconLink.setAttribute("href", "report_page.html#" + product.productId);
+    iconLink.innerHTML = '&#128196;';
+    ul.id = "products";
+    ul.innerHTML = product.productId;
+
+    link.style.textDecoration = "none"
     link.innerText = product.id;
     link.setAttribute("href", `javascript:selectProduct("${id}");`);
     element.appendChild(link);
-    list.appendChild(element);
+    list.appendChild(element); 
+
+    */
   }
 }
 
