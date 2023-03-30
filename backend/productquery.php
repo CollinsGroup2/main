@@ -42,6 +42,7 @@ function productQuery($missions)
         $type = $data['product']['result']['type'];
         $footprint = $data['product']['result']['footprint'];
         $policy = $data['product']['result']['security']['policy'];
+        $title = $data['product']['result']['title'];
 
         //assign metadata to relevent array and encode to json string
         $results[] = array(
@@ -51,7 +52,8 @@ function productQuery($missions)
             $dateModified,
             $footprint,
             $type,
-            $policy
+            $policy,
+            $title
         );
     }
 
