@@ -70,6 +70,7 @@ function fetchProducts(pgId) {
           footprint: mission[4],
           type: mission[5],
           policy: mission[6],
+          title: mission[7]
         };
       }
 
@@ -94,7 +95,7 @@ function updateProductsList(search) {
     const product = products[id];
 
     // Ignore this if there's a search query and this product doesn't match it
-    if (search && !id.includes(search)) {
+    if (search && !product.title.includes(search)) {
       continue;
     }
     if (policyFilter && product.policy !== policyFilter) {
@@ -150,7 +151,7 @@ function updateProductsList(search) {
     link.setAttribute("href", `javascript:selectProduct("${id}");`);
     link.onclick = () => { productLinkClick(product); };
     ul.id = "products";
-    ul.innerHTML = product.id;
+    ul.innerHTML = product.title;
 
     div.appendChild(innerDiv);
     innerDiv.appendChild(link);
@@ -263,6 +264,7 @@ function selectProduct(id) {
   const details = document.getElementById("details");
   details.innerHTML = `
         <strong>ID:</strong> ${id}<br/>
+        <strong>Title:</strong> ${currentProduct.title}<br/>
         <strong>Centre:</strong> ${currentProduct.centre}<br/>
         <strong>Created:</strong> ${dateFormat.format(
           currentProduct.creation

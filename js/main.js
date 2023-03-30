@@ -132,6 +132,7 @@ function getPoints(pgId) {
                 const footprint = mission[4];
                 const type = mission[5];
                 const policy = mission[6];
+                const title = mission[7];
 
                 // Determine icon
                 let icon;
@@ -153,6 +154,7 @@ function getPoints(pgId) {
                 // The marker itself
                 const marker = L.marker(coords, {icon:icon});
                 marker.productId = id;
+                marker.productTitle = title;
 
                 // Create the footprint layer from the GeoJSON
                 const layer = L.GeoJSON.geometryToLayer(footprint, {
@@ -167,6 +169,7 @@ function getPoints(pgId) {
                 // Popup text
                 let markerText = "";
                 markerText += `<strong>ID:</strong> <code>${id}</code><br/>`;
+                markerText += `<strong>Title:</strong> <code>${title}</code><br/>`;
                 markerText += `<strong>Type:</strong> <code>${type}</code><br/>`;
                 markerText += `<strong>Centre:</strong> ${coords[0]}, ${coords[1]}<br/>`;
                 markerText += `<strong>Created:</strong> ${dateFormat.format(creationDate)}<br/>`;
@@ -331,7 +334,7 @@ function updateProductsList(productList) {
         iconLink.setAttribute("href", "report_page.html#" + product.productId);
         iconLink.innerHTML = '&#128196;';
         ul.id = "products";
-        ul.innerHTML = product.productId;
+        ul.innerHTML = product.productTitle;
 
         div.appendChild(innerDiv);
         innerDiv.appendChild(link);
