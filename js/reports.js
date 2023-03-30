@@ -215,10 +215,6 @@ function updatePoliciesList() {
   }
 }
 
-function doSearch() {
-  updateProductsList();
-}
-
 function setPolicyFilter() {
   policyFilter = this.innerText;
   updateProductsList();

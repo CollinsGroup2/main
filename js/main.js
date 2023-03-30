@@ -345,6 +345,18 @@ function updateProductsList(productList) {
     }
 }
 
+// Search callback
+function doSearch() {
+    const field = document.getElementById("search");
+    let productList = [];
+    for (let i = 0; i < products.length; i++) {
+        if (products[i].productTitle.includes(field.value)) {
+            productList.push(products[i]);
+        }
+    }
+    updateProductsList(productList);
+}
+
 // Gets a product's marker by its ID
 function getMarkerById(id) {
     for (const marker of products) {
